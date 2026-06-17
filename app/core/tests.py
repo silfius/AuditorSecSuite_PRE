@@ -654,6 +654,153 @@ class SafeCheckCatalogSeedTests(TestCase):
         self.assertContains(response, "http-security-headers-manual-review")
 
 
+
+class SafeCheckApplicabilityTests(TestCase):
+    def setUp(self):
+        self.user = _safe_get_user_model().objects.create_user(
+            username=f"applicability-user-{_safe_uuid4().hex[:8]}",
+            password="test-pass-12345",
+        )
+        self.client.force_login(self.user)
+
+        self.audit = self._create_audit("Applicability audit")
+
+        self.url_asset = self._create_asset("Aplicabilidad URL", "url", "https://example.test")
+        self.domain_asset = self._create_asset("Aplicabilidad dominio", "dominio", "example.test")
+        self.host_asset = self._create_asset("Aplicabilidad host", "host", "192.0.2.10")
+
+        AuditoriaActivo.objects.create(auditoria=self.audit, activo=self.url_asset)
+        AuditoriaActivo.objects.create(auditoria=self.audit, activo=self.domain_asset)
+        AuditoriaActivo.objects.create(auditoria=self.audit, activo=self.host_asset)
+
+    def _create_asset(self, nombre, tipo, valor):
+        return Activo.objects.create(
+            nombre=nombre,
+            tipo=tipo,
+            valor=valor,
+            entorno="test",
+            autorizado=True,
+            activo=True,
+        )
+
+    def _create_audit(self, nombre):
+        data = {}
+        for field in Auditoria._meta.fields:
+            if field.auto_created or field.primary_key:
+                continue
+            if field.has_default() or field.null or field.blank:
+                continue
+            if isinstance(field, _safe_django_models.ForeignKey):
+                if field.remote_field.model == _safe_get_user_model():
+                    data[field.name] = self.user
+                continue
+            if getattr(field, "choices", None):
+                for value, _label in field.choices:
+                    if value not in ("", None):
+                        data[field.name] = value
+                        break
+            elif isinstance(field, (_safe_django_models.CharField, _safe_django_models.SlugField)):
+                data[field.name] = nombre[: field.max_length or 80]
+            elif isinstance(field, _safe_django_models.TextField):
+                data[field.name] = "Auditoría de test de aplicabilidad."
+            elif isinstance(field, _safe_django_models.BooleanField):
+                data[field.name] = True
+            elif isinstance(field, _safe_django_models.DateField):
+                data[field.name] = _safe_date.today()
+            elif isinstance(field, _safe_django_models.DateTimeField):
+                from django.utils import timezone
+                data[field.name] = timezone.now()
+            elif isinstance(field, _safe_django_models.IntegerField):
+                data[field.name] = 1
+        return Auditoria.objects.create(**data)
+
+    def test_check_definition_applies_using_asset_type_aliases(self):
+        tls_check = CheckDefinition.objects.get(codigo="tls-certificate-manual-review")
+        dns_check = CheckDefinition.objects.get(codigo="dns-public-records-inventory")
+        http_check = CheckDefinition.objects.get(codigo="http-security-headers-manual-review")
+        infra_check = CheckDefinition.objects.get(codigo="infra-exposed-services-manual-review")
+
+        self.assertTrue(tls_check.applies_to_asset(self.url_asset))
+        self.assertTrue(tls_check.applies_to_asset(self.domain_asset))
+        self.assertFalse(tls_check.applies_to_asset(self.host_asset))
+
+        self.assertTrue(dns_check.applies_to_asset(self.domain_asset))
+        self.assertFalse(dns_check.applies_to_asset(self.url_asset))
+
+        self.assertTrue(http_check.applies_to_asset(self.url_asset))
+        self.assertFalse(http_check.applies_to_asset(self.domain_asset))
+
+        self.assertTrue(infra_check.applies_to_asset(self.host_asset))
+        self.assertFalse(infra_check.applies_to_asset(self.url_asset))
+
+    def test_plan_rejects_check_not_applicable_to_asset_type(self):
+        dns_check = CheckDefinition.objects.get(codigo="dns-public-records-inventory")
+
+        plan = AuditCheckPlan(
+            auditoria=self.audit,
+            activo=self.url_asset,
+            check_definition=dns_check,
+            estado=AuditCheckPlan.STATE_PLANNED,
+        )
+
+        with self.assertRaises(_SafeValidationError):
+            plan.full_clean()
+
+    def test_plan_accepts_check_applicable_to_asset_type(self):
+        http_check = CheckDefinition.objects.get(codigo="http-security-headers-manual-review")
+
+        plan = AuditCheckPlan(
+            auditoria=self.audit,
+            activo=self.url_asset,
+            check_definition=http_check,
+            estado=AuditCheckPlan.STATE_PLANNED,
+        )
+
+        plan.full_clean()
+
+    def test_form_filters_checks_by_selected_asset_type(self):
+        form = AuditCheckPlanForm(
+            data={
+                "activo": self.url_asset.pk,
+                "check_definition": CheckDefinition.objects.get(codigo="http-security-headers-manual-review").pk,
+                "estado": AuditCheckPlan.STATE_PLANNED,
+                "motivo_bloqueo": "",
+            },
+            auditoria=self.audit,
+        )
+
+        queryset_codes = set(form.fields["check_definition"].queryset.values_list("codigo", flat=True))
+
+        self.assertIn("http-security-headers-manual-review", queryset_codes)
+        self.assertIn("tls-certificate-manual-review", queryset_codes)
+        self.assertNotIn("dns-public-records-inventory", queryset_codes)
+        self.assertNotIn("infra-exposed-services-manual-review", queryset_codes)
+
+    def test_post_cannot_force_inapplicable_check(self):
+        dns_check = CheckDefinition.objects.get(codigo="dns-public-records-inventory")
+        response = self.client.post(
+            _safe_reverse("core_audit_check_plan_create", args=[self.audit.pk]),
+            {
+                "activo": self.url_asset.pk,
+                "check_definition": dns_check.pk,
+                "estado": AuditCheckPlan.STATE_PLANNED,
+                "motivo_bloqueo": "",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Escoja una opción válida")
+        self.assertContains(response, "Esa opción no está entre las disponibles")
+        self.assertFalse(
+            AuditCheckPlan.objects.filter(
+                auditoria=self.audit,
+                activo=self.url_asset,
+                check_definition=dns_check,
+            ).exists()
+        )
+
+
+
 class SafeCheckPlanningTests(TestCase):
     def setUp(self):
         self.user = _safe_get_user_model().objects.create_user(

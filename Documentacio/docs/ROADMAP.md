@@ -32,3 +32,7 @@ Se inicia la capa de checks seguros sin ejecución. El objetivo es definir y pla
 ### 2026-06-17 — Bloque 8A en curso: catálogo inicial de checks seguros
 
 Se avanza en catálogo declarativo de checks manuales/pasivos antes de cualquier integración de motores. La fase sigue siendo planificación segura: no hay ejecución técnica.
+
+### 2026-06-17 — Bloque 8B en curso: aplicabilidad inteligente de checks
+
+Antes de ejecutar motores reales, se refuerza la calidad de planificación validando que cada check aplica al tipo de activo correspondiente.
