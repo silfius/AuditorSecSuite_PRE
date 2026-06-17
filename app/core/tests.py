@@ -594,6 +594,66 @@ from .forms import AuditCheckPlanForm
 _SAFE_CORE_DIR = _SafePath(__file__).resolve().parent
 
 
+
+class SafeCheckCatalogSeedTests(TestCase):
+    def test_initial_safe_check_catalog_is_seeded(self):
+        expected_codes = {
+            "tls-certificate-manual-review",
+            "tls-protocol-policy-review",
+            "http-security-headers-manual-review",
+            "http-cookie-flags-manual-review",
+            "dns-public-records-inventory",
+            "dns-email-authentication-review",
+            "web-login-surface-manual-review",
+            "web-exposed-admin-manual-review",
+            "infra-exposed-services-manual-review",
+            "internal-availability-evidence-review",
+        }
+
+        found_codes = set(
+            CheckDefinition.objects.filter(codigo__in=expected_codes).values_list("codigo", flat=True)
+        )
+
+        self.assertEqual(found_codes, expected_codes)
+
+    def test_initial_safe_check_catalog_is_non_intrusive_and_manual(self):
+        seeded = CheckDefinition.objects.filter(
+            codigo__in=[
+                "tls-certificate-manual-review",
+                "tls-protocol-policy-review",
+                "http-security-headers-manual-review",
+                "http-cookie-flags-manual-review",
+                "dns-public-records-inventory",
+                "dns-email-authentication-review",
+                "web-login-surface-manual-review",
+                "web-exposed-admin-manual-review",
+                "infra-exposed-services-manual-review",
+                "internal-availability-evidence-review",
+            ]
+        )
+
+        self.assertEqual(seeded.count(), 10)
+        self.assertFalse(
+            seeded.filter(nivel_riesgo_operativo=CheckDefinition.RISK_INTRUSIVE).exists()
+        )
+        self.assertFalse(
+            seeded.exclude(engine_key=CheckDefinition.ENGINE_MANUAL).exists()
+        )
+        self.assertFalse(seeded.filter(is_enabled=False).exists())
+        self.assertFalse(seeded.filter(requiere_autorizacion=False).exists())
+
+    def test_check_list_shows_seeded_catalog(self):
+        user = get_user_model().objects.create_user(
+            username="safe-catalog-test-user",
+            password="test-pass-12345",
+        )
+        self.client.force_login(user)
+        response = self.client.get(reverse("core_check_list"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Revisión manual de certificado TLS")
+        self.assertContains(response, "http-security-headers-manual-review")
+
+
 class SafeCheckPlanningTests(TestCase):
     def setUp(self):
         self.user = _safe_get_user_model().objects.create_user(

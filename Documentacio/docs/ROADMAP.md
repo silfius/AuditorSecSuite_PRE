@@ -28,3 +28,7 @@ Cerrado el detalle operativo de auditorías y findings. El proyecto queda prepar
 ### 2026-06-17 — Bloque 7A — checks seguros planificados
 
 Se inicia la capa de checks seguros sin ejecución. El objetivo es definir y planificar controles técnicos de forma declarativa antes de integrar cualquier motor real.
+
+### 2026-06-17 — Bloque 8A en curso: catálogo inicial de checks seguros
+
+Se avanza en catálogo declarativo de checks manuales/pasivos antes de cualquier integración de motores. La fase sigue siendo planificación segura: no hay ejecución técnica.

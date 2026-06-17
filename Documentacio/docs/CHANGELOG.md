@@ -259,3 +259,51 @@ Evidencias ejecutadas:
   - `SMOKE_CLEANUP_OK=1`, sin residuos de smoke.
 
 Conclusión: la capa queda validada como planificación declarativa/controlada, sin motor real, sin red, sin comandos y sin creación automática de findings.
+
+## v0.2.8-pre — catálogo inicial declarativo de checks seguros
+
+### Añadido
+- Migración de datos `core.0003_seed_initial_safe_check_definitions`.
+- Catálogo inicial de 10 checks seguros, manuales y pasivos: TLS, cabeceras HTTP, cookies, DNS, autenticación de correo, superficie web, paneles administrativos expuestos, servicios expuestos y disponibilidad documentada.
+- Tests específicos `SafeCheckCatalogSeedTests`.
+
+### Seguridad
+- Los checks sembrados son declarativos: `engine_key=manual`.
+- No se ejecutan motores, red, comandos, escaneos ni peticiones HTTP/DNS.
+- Todos los checks iniciales son no intrusivos y requieren autorización.
+
+### Validación
+- Pendiente de completar en el cierre del bloque 8A.
+
+<!-- AUDITORSECSUITE_SAFE_CHECK_CATALOG_8A_VALIDATION_20260617 -->
+### Evidencia de validación — Bloque 8A catálogo inicial de checks seguros
+
+Fecha: 2026-06-17.
+
+Resultado validado:
+
+- Migración de datos: `core.0003_seed_initial_safe_check_definitions`.
+- Catálogo inicial sembrado: 10 checks.
+- Todos los checks iniciales son manuales: `engine_key=manual`.
+- Todos los checks iniciales son pasivos: `nivel_riesgo_operativo=passive`.
+- Todos los checks iniciales están activos y requieren autorización.
+- `INTRUSIVE_COUNT=0`.
+- `NON_MANUAL_COUNT=0`.
+- `DISABLED_COUNT=0`.
+- `NO_AUTH_REQUIRED_COUNT=0`.
+- `python manage.py check`: OK.
+- `python manage.py makemigrations --check --dry-run`: OK.
+- `SafeCheckCatalogSeedTests`: 3 tests OK.
+- `SafeCheckPlanningTests`: 5 tests OK.
+- Suite `core`: 43 tests OK.
+- Auditoría anti-ejecución: sin `subprocess`, `os.system`, `Popen`, `requests.` ni `socket.` en código del bloque.
+- Security audit: `OK_SECURITY_AUDIT=1`.
+- Validadores documentales/proyecto: `OK_DOCUMENTATION_ALIGNMENT=1` y `OK_PROJECT_ALIGNMENT=1`.
+- Smoke autenticado con check sembrado:
+  - listado de checks muestra el catálogo.
+  - planificación con `tls-certificate-manual-review`: OK.
+  - detalle de auditoría muestra el check planificado.
+  - no se crean findings automáticos.
+  - no se ejecutan motores.
+
+Conclusión: el catálogo inicial queda validado como base declarativa segura para planificación, sin ejecución técnica.

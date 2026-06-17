@@ -34,3 +34,40 @@ Antes de integrar motores técnicos reales se implementa una capa de catálogo y
 Durante el bloque de checks seguros se confirmó que el servicio `app` usa `COPY app /app` en la imagen y no un bind mount del código fuente. Por tanto, después de modificar código en el host, Django dentro del contenedor no ve los cambios hasta ejecutar `docker compose up -d --build app`.
 
 También queda como cautela operativa no imprimir `docker compose config` completo en salidas compartidas, porque puede exponer valores procedentes de `.env`.
+
+### Decisión — catálogo inicial como migración de datos
+
+El catálogo inicial de checks seguros se implementa como migración de datos para que sea reproducible en cualquier entorno y en la base de test. No se usa carga manual puntual ni script operativo aislado.
+
+<!-- AUDITORSECSUITE_SAFE_CHECK_CATALOG_8A_VALIDATION_20260617 -->
+### Evidencia de validación — Bloque 8A catálogo inicial de checks seguros
+
+Fecha: 2026-06-17.
+
+Resultado validado:
+
+- Migración de datos: `core.0003_seed_initial_safe_check_definitions`.
+- Catálogo inicial sembrado: 10 checks.
+- Todos los checks iniciales son manuales: `engine_key=manual`.
+- Todos los checks iniciales son pasivos: `nivel_riesgo_operativo=passive`.
+- Todos los checks iniciales están activos y requieren autorización.
+- `INTRUSIVE_COUNT=0`.
+- `NON_MANUAL_COUNT=0`.
+- `DISABLED_COUNT=0`.
+- `NO_AUTH_REQUIRED_COUNT=0`.
+- `python manage.py check`: OK.
+- `python manage.py makemigrations --check --dry-run`: OK.
+- `SafeCheckCatalogSeedTests`: 3 tests OK.
+- `SafeCheckPlanningTests`: 5 tests OK.
+- Suite `core`: 43 tests OK.
+- Auditoría anti-ejecución: sin `subprocess`, `os.system`, `Popen`, `requests.` ni `socket.` en código del bloque.
+- Security audit: `OK_SECURITY_AUDIT=1`.
+- Validadores documentales/proyecto: `OK_DOCUMENTATION_ALIGNMENT=1` y `OK_PROJECT_ALIGNMENT=1`.
+- Smoke autenticado con check sembrado:
+  - listado de checks muestra el catálogo.
+  - planificación con `tls-certificate-manual-review`: OK.
+  - detalle de auditoría muestra el check planificado.
+  - no se crean findings automáticos.
+  - no se ejecutan motores.
+
+Conclusión: el catálogo inicial queda validado como base declarativa segura para planificación, sin ejecución técnica.

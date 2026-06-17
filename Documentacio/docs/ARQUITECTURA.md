@@ -33,3 +33,7 @@ Las vistas `audit_detail` y `finding_detail` consolidan una capa de trazabilidad
 `CheckDefinition` define checks técnicos de forma declarativa. `AuditCheckPlan` permite planificar checks sobre una auditoría y un activo vinculado/autorizado.
 
 Esta capa no ejecuta motores, no contiene comandos y no realiza llamadas de red. Su función es preparar el control operativo previo a futuras integraciones técnicas.
+
+### Catálogo inicial de checks seguros
+
+`CheckDefinition` recibe una semilla inicial mediante migración de datos. El catálogo es declarativo y no añade capa de ejecución. La futura integración de motores deberá partir de estos identificadores sin convertir la planificación en ejecución automática.
