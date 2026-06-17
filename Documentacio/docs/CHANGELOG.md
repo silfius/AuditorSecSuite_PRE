@@ -1,5 +1,17 @@
 # CHANGELOG — AuditorSecSuite_PRE
 
+## v0.1.6-pre — plantillas públicas y premisas operativas
+
+### Añadido
+- Plantilla de pull request.
+- Plantillas de issue para bugs y specs.
+- `SPEC_002_PUBLIC_REPO_HARDENING.md`.
+- Premisa de commits estrictamente necesarios.
+- Premisa de criterio crítico ante decisiones propuestas.
+
+### Decisión
+- Se agrupan estos cambios en un único commit de cierre de hardening público, evitando microcommits documentales.
+
 ## v0.1.5-pre — LICENSE raíz conservadora
 
 ### Añadido
