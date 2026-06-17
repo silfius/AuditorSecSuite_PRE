@@ -19,3 +19,6 @@ Docs vivos en Documentacio/docs. Código: app/core/models.py, views.py, tests.py
 - `SPEC_006_CHECKS_SEGUROS_PLANIFICADOS.md`: catálogo y planificación de checks seguros sin ejecución.
 
 - `app/core/migrations/0003_seed_initial_safe_check_definitions.py`: seed declarativo del catálogo inicial de checks seguros.
+
+- `CheckDefinition.applies_to_asset()`: normaliza alias de tipo de activo y decide aplicabilidad de checks.
+- `SafeCheckApplicabilityTests`: pruebas de aplicabilidad por tipo de activo.

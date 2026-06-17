@@ -307,3 +307,56 @@ Resultado validado:
   - no se ejecutan motores.
 
 Conclusión: el catálogo inicial queda validado como base declarativa segura para planificación, sin ejecución técnica.
+
+## v0.2.9-pre — aplicabilidad de checks por tipo de activo
+
+### Añadido
+- Normalización de tipos de activo para checks seguros.
+- Validación backend para impedir planificar checks no aplicables al tipo de activo.
+- Filtrado del queryset de checks en el formulario de planificación cuando hay activo seleccionado.
+- Tests `SafeCheckApplicabilityTests`.
+
+### Seguridad funcional
+- El formulario no es la única barrera: `AuditCheckPlan.clean()` bloquea combinaciones incoherentes aunque se manipule el POST.
+- No se añaden motores, red ni ejecución técnica.
+
+### Validación
+- Pendiente de completar en el cierre del bloque 8B.
+
+<!-- AUDITORSECSUITE_CHECK_APPLICABILITY_8B_VALIDATION_20260617 -->
+### Evidencia de validación — Bloque 8B aplicabilidad de checks por tipo de activo
+
+Fecha: 2026-06-17.
+
+Resultado validado:
+
+- Versión de trabajo: `0.2.9-pre`.
+- `CheckDefinition` incorpora normalización de alias entre tipos del catálogo (`web`, `domain`, `ip`, `host`) y tipos reales de activo (`url`, `dominio`, `host`, `servicio`, `contenedor`).
+- `CheckDefinition.applies_to_asset()` valida aplicabilidad sin ejecutar red ni motores.
+- `AuditCheckPlan.clean()` bloquea en backend checks no aplicables al tipo de activo.
+- `AuditCheckPlanForm` filtra checks activos, no intrusivos y aplicables al activo seleccionado.
+- POST manipulado con check DNS sobre activo URL: bloqueado, sin crear plan.
+- POST válido con check HTTP sobre activo URL: permitido.
+
+Validaciones ejecutadas:
+
+- `python manage.py check`: OK.
+- `python manage.py makemigrations --check --dry-run`: OK.
+- `SafeCheckApplicabilityTests`: 5 tests OK.
+- `SafeCheckCatalogSeedTests` + `SafeCheckPlanningTests`: 8 tests OK.
+- Suite `core`: 48 tests OK.
+- Smoke funcional de aplicabilidad:
+  - `HTTP_APPLIES_URL=True`.
+  - `DNS_APPLIES_URL=False`.
+  - `INVALID_POST_STATUS=200`.
+  - `INVALID_POST_CREATED=False`.
+  - `VALID_POST_STATUS=302`.
+  - `NO_AUTOMATIC_FINDINGS_CREATED=1`.
+  - `NO_ENGINE_EXECUTION_TRIGGERED=1`.
+  - `OK_APPLICABILITY_FUNCTIONAL_SMOKE=1`.
+- Auditoría anti-ejecución: sin `subprocess`, `os.system`, `Popen`, `requests.` ni `socket.` en código del bloque.
+- Security audit: `OK_SECURITY_AUDIT=1`.
+- Validadores documentales/proyecto: `OK_DOCUMENTATION_ALIGNMENT=1` y `OK_PROJECT_ALIGNMENT=1`.
+- `git diff --check`: OK.
+
+Conclusión: la planificación de checks ya queda protegida contra combinaciones incoherentes por tipo de activo, sin introducir ejecución técnica.

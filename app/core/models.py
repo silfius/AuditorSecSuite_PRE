@@ -180,6 +180,56 @@ class CheckDefinition(models.Model):
         return f"{self.codigo} — {self.nombre}"
 
 
+    ASSET_TYPE_ALIASES = {
+        "url": {"url", "web"},
+        "web": {"url", "web"},
+        "dominio": {"dominio", "domain", "dns"},
+        "domain": {"dominio", "domain", "dns"},
+        "host": {"host", "ip"},
+        "ip": {"host", "ip"},
+        "servicio": {"servicio", "service"},
+        "service": {"servicio", "service"},
+        "contenedor": {"contenedor", "container"},
+        "container": {"contenedor", "container"},
+    }
+
+    def applicable_asset_tokens(self):
+        if not self.tipo_activo_aplicable:
+            return set()
+        return {
+            token.strip().lower()
+            for token in self.tipo_activo_aplicable.split(",")
+            if token.strip()
+        }
+
+    @classmethod
+    def normalized_asset_type_tokens(cls, asset_or_type):
+        if asset_or_type is None:
+            return set()
+
+        raw_type = getattr(asset_or_type, "tipo", asset_or_type)
+        if raw_type is None:
+            return set()
+
+        token = str(raw_type).strip().lower()
+        if not token:
+            return set()
+
+        return cls.ASSET_TYPE_ALIASES.get(token, {token})
+
+    def applies_to_asset(self, asset):
+        allowed_tokens = self.applicable_asset_tokens()
+        if not allowed_tokens:
+            return True
+
+        asset_tokens = self.normalized_asset_type_tokens(asset)
+        return bool(allowed_tokens.intersection(asset_tokens))
+
+    def get_applicable_asset_tokens_display(self):
+        tokens = sorted(self.applicable_asset_tokens())
+        return ", ".join(tokens) if tokens else "Todos"
+
+
 class AuditCheckPlan(models.Model):
     """Planificación segura de checks sobre una auditoría y activo autorizado.
 
@@ -251,6 +301,11 @@ class AuditCheckPlan(models.Model):
             if self.check_definition.nivel_riesgo_operativo == CheckDefinition.RISK_INTRUSIVE:
                 raise ValidationError({
                     "check_definition": "Los checks intrusivos no están permitidos en esta fase."
+                })
+
+            if self.activo_id and not self.check_definition.applies_to_asset(self.activo):
+                raise ValidationError({
+                    "check_definition": "El check seleccionado no aplica al tipo de activo informado."
                 })
 
     def save(self, *args, **kwargs):

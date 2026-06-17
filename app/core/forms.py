@@ -188,6 +188,37 @@ class AuditCheckPlanForm(forms.ModelForm):
             ]
             self.fields["activo"].queryset = Activo.objects.filter(pk__in=activos_ids).order_by("nombre")
 
+        selected_asset = self._selected_asset_for_check_filter()
+        if selected_asset is not None:
+            applicable_ids = [
+                check.pk
+                for check in self.fields["check_definition"].queryset
+                if check.applies_to_asset(selected_asset)
+            ]
+            self.fields["check_definition"].queryset = self.fields["check_definition"].queryset.filter(
+                pk__in=applicable_ids
+            )
+
+        self.fields["check_definition"].help_text = (
+            "Solo se muestran checks activos, no intrusivos y aplicables al tipo de activo seleccionado."
+        )
+
+    def _selected_asset_for_check_filter(self):
+        asset_id = None
+
+        if self.is_bound:
+            asset_id = self.data.get(self.add_prefix("activo"))
+        elif getattr(self.instance, "activo_id", None):
+            asset_id = self.instance.activo_id
+
+        if not asset_id:
+            return None
+
+        try:
+            return self.fields["activo"].queryset.get(pk=asset_id)
+        except (Activo.DoesNotExist, ValueError, TypeError):
+            return None
+
     def clean(self):
         cleaned_data = super().clean()
         if self.auditoria is not None and cleaned_data.get("activo") and cleaned_data.get("check_definition"):
