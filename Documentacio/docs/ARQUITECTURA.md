@@ -20,4 +20,10 @@ La interfaz mantiene CSS propio en `core/base.html` como base inicial: página c
 
 ## Selector dinámico auditoría-activo en Findings
 
-El formulario de Findings usa un endpoint autenticado para cargar dinámicamente los activos auditables de la auditoría seleccionada. La validación server-side de `FindingForm` sigue siendo la autoridad funcional.
+El formulario de Findings usa un endpoint autenticado para cargar dinámicamente los activos auditables de la auditoría seleccionada. La validación server-side de `FindingForm` sigue siendo la autoridad funcional.\n\n## Detalles de auditorías y findings
+
+Las vistas de detalle son de lectura operativa y mantienen `login_required`. `audit_detail` muestra datos de auditoría, activos vinculados y findings asociados. `finding_detail` muestra contexto de auditoría, activo y campos descriptivos del hallazgo. Ninguna vista ejecuta motores técnicos.\n
+
+### Cierre detalle operativo `v0.2.6-pre`
+
+Las vistas `audit_detail` y `finding_detail` consolidan una capa de trazabilidad de lectura. Se mantiene separación estricta entre visualización operativa y ejecución técnica: ninguna vista de detalle ejecuta motores ni automatismos.

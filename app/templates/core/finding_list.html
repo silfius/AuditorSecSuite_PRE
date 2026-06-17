@@ -32,7 +32,7 @@
           <td><span class="pill">{{ finding.get_severidad_display }}</span></td>
           <td><span class="pill pill-muted">{{ finding.get_estado_display }}</span></td>
           <td>{{ finding.herramienta|default:"Manual" }}</td>
-          <td><a class="btn btn-secondary" href="{% url "finding_update" finding.pk %}">Editar</a></td>
+          <td><a class="btn btn-secondary" href="{% url "finding_detail" finding.pk %}">Ver</a> <a class="btn btn-secondary" href="{% url "finding_update" finding.pk %}">Editar</a></td>
         </tr>
       {% empty %}
         <tr>

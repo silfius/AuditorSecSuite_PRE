@@ -496,3 +496,84 @@ class FindingDynamicAssetSelectorTests(TestCase):
         self.assertContains(response, "data-assets-url-template")
         self.assertContains(response, "/app/findings/auditorias/0/activos/")
         self.assertContains(response, "loadAssets")
+
+class DetailViewsTests(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(username="detail-user", password="unused")
+        self.audit = Auditoria.objects.create(
+            nombre="Auditoría detalle",
+            alcance="Alcance de detalle.",
+            perfil=Auditoria._meta.get_field("perfil").choices[0][0],
+            estado=Auditoria._meta.get_field("estado").choices[0][0],
+            creado_por=self.user,
+        )
+        self.linked_asset = Activo.objects.create(
+            nombre="Activo detalle vinculado",
+            tipo=Activo.Tipo.URL,
+            valor="https://detail-linked.example.test",
+            entorno="PRE",
+            autorizado=True,
+            activo=True,
+        )
+        self.unauthorized_asset = Activo.objects.create(
+            nombre="Activo detalle no autorizado",
+            tipo=Activo.Tipo.URL,
+            valor="https://detail-unauthorized.example.test",
+            entorno="PRE",
+            autorizado=False,
+            activo=True,
+        )
+        AuditoriaActivo.objects.create(auditoria=self.audit, activo=self.linked_asset)
+        AuditoriaActivo.objects.create(auditoria=self.audit, activo=self.unauthorized_asset)
+        self.finding = Finding.objects.create(
+            auditoria=self.audit,
+            activo=self.linked_asset,
+            titulo="Finding detalle",
+            severidad=Finding._meta.get_field("severidad").choices[0][0],
+            estado=Finding._meta.get_field("estado").choices[0][0],
+            herramienta="Manual",
+            descripcion="Descripción detalle",
+            evidencia="Evidencia detalle",
+            recomendacion="Recomendación detalle",
+            referencia="REF-DET",
+        )
+
+    def test_audit_detail_requires_login(self):
+        response = self.client.get(reverse("audit_detail", args=[self.audit.pk]))
+        self.assertEqual(response.status_code, 302)
+
+    def test_finding_detail_requires_login(self):
+        response = self.client.get(reverse("finding_detail", args=[self.finding.pk]))
+        self.assertEqual(response.status_code, 302)
+
+    def test_audit_detail_shows_assets_and_findings(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("audit_detail", args=[self.audit.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Auditoría detalle")
+        self.assertContains(response, "Activo detalle vinculado")
+        self.assertContains(response, "Activo detalle no autorizado")
+        self.assertContains(response, "Auditable")
+        self.assertContains(response, "No auditable actualmente")
+        self.assertContains(response, "Finding detalle")
+
+    def test_finding_detail_shows_context(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("finding_detail", args=[self.finding.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Finding detalle")
+        self.assertContains(response, "Auditoría detalle")
+        self.assertContains(response, "Activo detalle vinculado")
+        self.assertContains(response, "Descripción detalle")
+        self.assertContains(response, "Recomendación detalle")
+
+    def test_lists_include_detail_links(self):
+        self.client.force_login(self.user)
+
+        audit_response = self.client.get(reverse("audit_list"))
+        self.assertEqual(audit_response.status_code, 200)
+        self.assertContains(audit_response, reverse("audit_detail", args=[self.audit.pk]))
+
+        finding_response = self.client.get(reverse("finding_list"))
+        self.assertEqual(finding_response.status_code, 200)
+        self.assertContains(finding_response, reverse("finding_detail", args=[self.finding.pk]))

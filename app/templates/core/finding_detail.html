@@ -1,0 +1,58 @@
+{% extends "core/base.html" %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <h1 class="page-title">{{ finding.titulo }}</h1>
+    <p class="page-subtitle">Detalle de finding manual vinculado a auditoría y activo autorizado.</p>
+  </div>
+  <div class="toolbar">
+    <a class="btn btn-secondary" href="{% url "finding_list" %}">Volver</a>
+    <a class="btn btn-primary" href="{% url "finding_update" finding.pk %}">Editar finding</a>
+  </div>
+</section>
+
+<div class="notice">
+  <strong>Guardarraíl:</strong> este finding es informativo/manual. No ejecuta motores ni acciones técnicas.
+</div>
+
+<div class="form-card">
+  <div class="form-grid">
+    <div class="field">
+      <label>Auditoría</label>
+      <div><a href="{% url "audit_detail" finding.auditoria.pk %}">{{ finding.auditoria }}</a></div>
+    </div>
+    <div class="field">
+      <label>Activo</label>
+      <div>{{ finding.activo }}</div>
+    </div>
+    <div class="field">
+      <label>Severidad</label>
+      <div class="pill">{{ finding.get_severidad_display }}</div>
+    </div>
+    <div class="field">
+      <label>Estado</label>
+      <div class="pill pill-muted">{{ finding.get_estado_display }}</div>
+    </div>
+    <div class="field">
+      <label>Herramienta / origen</label>
+      <div>{{ finding.herramienta|default:"Manual" }}</div>
+    </div>
+    <div class="field">
+      <label>Referencia</label>
+      <div>{{ finding.referencia|default:"—" }}</div>
+    </div>
+    <div class="field field-full">
+      <label>Descripción</label>
+      <div>{{ finding.descripcion|default:"—"|linebreaksbr }}</div>
+    </div>
+    <div class="field field-full">
+      <label>Evidencia</label>
+      <div>{{ finding.evidencia|default:"—"|linebreaksbr }}</div>
+    </div>
+    <div class="field field-full">
+      <label>Recomendación</label>
+      <div>{{ finding.recomendacion|default:"—"|linebreaksbr }}</div>
+    </div>
+  </div>
+</div>
+{% endblock %}

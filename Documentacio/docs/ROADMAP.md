@@ -17,4 +17,10 @@ Crear alta/edición de findings manuales vinculados a una auditoría y a activos
 ### 2026-06-17 — Bloque cerrado: selector dinámico Findings
 
 - Cerrada la mejora UX/funcional que vincula dinámicamente auditoría y activos en el formulario de findings.
-- Siguiente evolución natural: mejorar detalle de auditoría/finding y preparar checks controlados sin ejecución real no autorizada.
+- Siguiente evolución natural: mejorar detalle de auditoría/finding y preparar checks controlados sin ejecución real no autorizada.\n\n### 2026-06-17 — Bloque 6A en curso: detalles operativos
+
+Se avanza en detalle de auditorías y findings antes de diseñar checks/motores controlados. Objetivo: mejorar trazabilidad funcional sin añadir ejecución técnica.\n
+
+### 2026-06-17 — Bloque cerrado: detalles operativos
+
+Cerrado el detalle operativo de auditorías y findings. El proyecto queda preparado para estudiar el siguiente paso: checks controlados, simulados o motores seguros, siempre sobre auditorías y activos autorizados.

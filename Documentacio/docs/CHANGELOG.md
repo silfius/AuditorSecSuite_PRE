@@ -1,5 +1,32 @@
 # CHANGELOG — AuditorSecSuite_PRE
 
+## v0.2.6-pre — detalle operativo de auditorías y findings
+
+### Añadido
+- Añadidas vistas de detalle para auditorías y findings.
+- Añadidas rutas `audit_detail` y `finding_detail`.
+- Añadidos templates `audit_detail.html` y `finding_detail.html`.
+- Añadida acción `Ver` en listados de auditorías y findings.
+- El detalle de auditoría muestra datos principales, activos vinculados y findings asociados.
+- El detalle de finding muestra auditoría, activo, severidad, estado, origen, descripción, evidencia, recomendación y referencia.
+
+### Seguridad
+- Las vistas de detalle mantienen `login_required`.
+- Las pantallas son informativas y no ejecutan motores técnicos.
+- El detalle de auditoría conserva trazabilidad mostrando activos vinculados aunque actualmente ya no sean auditables, diferenciándolos visualmente.
+
+### Validación
+- Build Docker OK.
+- `manage.py check` OK.
+- `makemigrations --check --dry-run` OK.
+- `python manage.py test core`: 35 tests OK.
+- Security audit OK.
+- Validadores de documentación/proyecto OK.
+- `git diff --check` OK.
+- Smoke HTTP autenticado de `audit_detail` y `finding_detail` OK.
+- Enlaces `Ver` desde listados OK.
+- Revisión visual aceptada por el usuario el 2026-06-17.
+
 ## v0.2.5-pre — preflight canónico de publicación
 
 ### Añadido

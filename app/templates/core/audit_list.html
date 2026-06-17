@@ -30,7 +30,7 @@
           <td><span class="pill">{{ audit.get_estado_display }}</span></td>
           <td>{{ audit.auditoria_activos.count }}</td>
           <td>{{ audit.creado_en }}</td>
-          <td><a class="btn btn-secondary" href="{% url "audit_update" audit.pk %}">Editar</a></td>
+          <td><a class="btn btn-secondary" href="{% url "audit_detail" audit.pk %}">Ver</a> <a class="btn btn-secondary" href="{% url "audit_update" audit.pk %}">Editar</a></td>
         </tr>
       {% empty %}
         <tr>

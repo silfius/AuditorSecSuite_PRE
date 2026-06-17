@@ -50,4 +50,30 @@ Pendiente de captura: formulario de finding con selector de activos cargado din�
 
 **Capturas pendientes para documentación final:**
 - [ ] Captura del formulario antes de seleccionar auditoría.
-- [ ] Captura del selector de activos cargado tras seleccionar auditoría.
+- [ ] Captura del selector de activos cargado tras seleccionar auditoría.\n\n## Detalle de auditorías y findings
+
+Pendiente de revisión visual.
+
+- Desde el listado de auditorías, la acción Ver abre el detalle de la auditoría.
+- El detalle de auditoría muestra datos principales, activos vinculados y findings asociados.
+- Desde el listado de findings, la acción Ver abre el detalle del finding.
+- El detalle de finding muestra auditoría, activo, severidad, estado, descripción, evidencia y recomendación.
+
+**Capturas pendientes:**
+- [ ] Detalle de auditoría.
+- [ ] Detalle de finding.\n
+
+### Detalle de auditorías y findings validado `v0.2.6-pre`
+
+- Desde el listado de auditorías, la acción **Ver** abre el detalle de la auditoría.
+- El detalle de auditoría muestra perfil, estado, usuario creador, alcance, activos vinculados y findings asociados.
+- Los activos vinculados se distinguen entre **Auditable** y **No auditable actualmente**.
+- Desde el listado de findings, la acción **Ver** abre el detalle del finding.
+- El detalle de finding muestra auditoría, activo, severidad, estado, herramienta/origen, descripción, evidencia, recomendación y referencia.
+- Validación visual aceptada el 2026-06-17.
+
+**Capturas pendientes para documentación final:**
+- [ ] Listado de auditorías con acción Ver.
+- [ ] Detalle de auditoría.
+- [ ] Listado de findings con acción Ver.
+- [ ] Detalle de finding.

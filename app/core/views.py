@@ -123,6 +123,24 @@ def audit_update(request, pk):
     })
 
 
+
+@login_required
+def audit_detail(request, pk):
+    audit = get_object_or_404(
+        Auditoria.objects.select_related("creado_por").prefetch_related(
+            "auditoria_activos__activo",
+            "findings__activo",
+        ),
+        pk=pk,
+    )
+    asset_links = audit.auditoria_activos.select_related("activo").order_by("activo__nombre")
+    findings = audit.findings.select_related("activo").order_by("-creado_en", "titulo")
+    return render(request, "core/audit_detail.html", {
+        "audit": audit,
+        "asset_links": asset_links,
+        "findings": findings,
+    })
+
 @login_required
 def finding_list(request):
     findings = Finding.objects.select_related("auditoria", "activo").all()
@@ -163,6 +181,15 @@ def finding_create(request):
         "submit_label": "Crear finding",
     })
 
+
+
+@login_required
+def finding_detail(request, pk):
+    finding = get_object_or_404(
+        Finding.objects.select_related("auditoria", "activo"),
+        pk=pk,
+    )
+    return render(request, "core/finding_detail.html", {"finding": finding})
 
 @login_required
 def finding_update(request, pk):

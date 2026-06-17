@@ -52,4 +52,15 @@ El selector dinámico de activos en Findings queda validado técnica y visualmen
 
 ## Bloque 5A — preflight canónico de publicación
 
-Se normaliza el cierre de publicación creando `./publication_preflight.sh` como ruta canónica. El objetivo es evitar falsos bloqueos por rutas inexistentes y centralizar las comprobaciones antes de `git push`. Versión: `v0.2.5-pre`.
+Se normaliza el cierre de publicación creando `./publication_preflight.sh` como ruta canónica. El objetivo es evitar falsos bloqueos por rutas inexistentes y centralizar las comprobaciones antes de `git push`. Versión: `v0.2.5-pre`.\n\n## Bloque 6A.2 — detalle operativo Auditorías/Findings
+
+Implementadas vistas de detalle para auditorías y findings, pendientes de revisión visual. El detalle de auditoría diferencia activos actualmente auditables y no auditables para mantener trazabilidad.\n
+
+## Bloque 6A.3 — cierre detalle operativo Auditorías/Findings
+
+El detalle operativo de auditorías y findings queda implementado, validado técnica y visualmente. Versión de cierre: `v0.2.6-pre`.
+
+- Auditorías: detalle con datos principales, activos vinculados y findings asociados.
+- Findings: detalle con contexto de auditoría, activo y campos descriptivos.
+- No se ejecutan motores técnicos.
+- Validación visual aceptada el 2026-06-17.

@@ -40,4 +40,21 @@ Validaciones ejecutadas para cierre `v0.2.4-pre`:
 - Ejecución directa `./publication_preflight.sh`.
 - Security audit.
 - Validadores de documentación/proyecto.
-- `git diff --check` y `git diff --cached --check`.
+- `git diff --check` y `git diff --cached --check`.\n\n## Detalles Auditorías/Findings
+
+Cobertura añadida: `DetailViewsTests` valida login requerido, render de detalle de auditoría, render de detalle de finding y enlaces Ver desde listados.\n
+
+### 2026-06-17 — Validación cierre detalles Auditorías/Findings
+
+Validaciones ejecutadas para cierre `v0.2.6-pre`:
+
+- Build Docker.
+- `python manage.py check`.
+- `python manage.py makemigrations --check --dry-run`.
+- Suite `core`: 35 tests OK.
+- Security audit.
+- Validadores de documentación y proyecto.
+- `git diff --check`.
+- Smoke HTTP autenticado de `audit_detail` y `finding_detail`.
+- Validación de enlaces `Ver` desde listados.
+- Validación visual aceptada por el usuario.
