@@ -20,7 +20,7 @@ class CoreModelTests(TestCase):
         self.asset = Activo.objects.create(
             nombre="Servidor PRE",
             tipo=Activo.Tipo.HOST,
-            valor="192.168.1.253",
+            valor="<LAN_IP>",
             entorno="LAN",
             autorizado=True,
         )
