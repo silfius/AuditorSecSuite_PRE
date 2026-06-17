@@ -1,17 +1,81 @@
 {% extends "core/base.html" %}
 {% block content %}
-<h1>{{ title }}</h1>
+<section class="page-head">
+  <div>
+    <h1 class="page-title">{{ title }}</h1>
+    <p class="page-subtitle">Registra activos propios o con autorización explícita. La autorización es un guardarraíl previo a cualquier auditoría técnica.</p>
+  </div>
+</section>
 
-<div class="card">
-  <p><strong>Regla de seguridad:</strong> solo marca un activo como autorizado si es propio o existe autorización explícita para auditarlo.</p>
+<div class="notice">
+  <strong>Regla de seguridad:</strong> solo marca un activo como autorizado si es propio o existe autorización explícita para auditarlo.
 </div>
 
-<form method="post">
+<form method="post" class="form-card">
   {% csrf_token %}
-  {{ form.as_p }}
-  <p>
-    <button type="submit">{{ submit_label }}</button>
-    <a href="{% url "asset_list" %}">Cancelar</a>
-  </p>
+
+  {% if form.non_field_errors %}
+    <div class="notice warn">{{ form.non_field_errors }}</div>
+  {% endif %}
+
+  <div class="form-grid">
+    <div class="field">
+      <label for="{{ form.nombre.id_for_label }}">Nombre</label>
+      {{ form.nombre }}
+      {% if form.nombre.errors %}<div class="help">{{ form.nombre.errors }}</div>{% endif %}
+    </div>
+
+    <div class="field">
+      <label for="{{ form.tipo.id_for_label }}">Tipo</label>
+      {{ form.tipo }}
+      {% if form.tipo.errors %}<div class="help">{{ form.tipo.errors }}</div>{% endif %}
+    </div>
+
+    <div class="field">
+      <label for="{{ form.valor.id_for_label }}">Valor</label>
+      {{ form.valor }}
+      {% if form.valor.help_text %}<div class="help">{{ form.valor.help_text }}</div>{% endif %}
+      {% if form.valor.errors %}<div class="help">{{ form.valor.errors }}</div>{% endif %}
+    </div>
+
+    <div class="field">
+      <label for="{{ form.entorno.id_for_label }}">Entorno</label>
+      {{ form.entorno }}
+      {% if form.entorno.errors %}<div class="help">{{ form.entorno.errors }}</div>{% endif %}
+    </div>
+
+    <div class="field field-full">
+      <label class="check-row" for="{{ form.autorizado.id_for_label }}">
+        {{ form.autorizado }}
+        <span>
+          <strong>Activo autorizado</strong><br>
+          <span class="help">{{ form.autorizado.help_text }}</span>
+        </span>
+      </label>
+      {% if form.autorizado.errors %}<div class="help">{{ form.autorizado.errors }}</div>{% endif %}
+    </div>
+
+    <div class="field field-full">
+      <label class="check-row" for="{{ form.activo.id_for_label }}">
+        {{ form.activo }}
+        <span>
+          <strong>Activo operativo</strong><br>
+          <span class="help">Desmarca este campo para conservar el activo en histórico sin usarlo operativamente.</span>
+        </span>
+      </label>
+      {% if form.activo.errors %}<div class="help">{{ form.activo.errors }}</div>{% endif %}
+    </div>
+
+    <div class="field field-full">
+      <label for="{{ form.notas.id_for_label }}">Notas</label>
+      {{ form.notas }}
+      {% if form.notas.errors %}<div class="help">{{ form.notas.errors }}</div>{% endif %}
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button class="btn btn-primary" type="submit">{{ submit_label }}</button>
+    <a class="btn btn-secondary" href="{% url "asset_list" %}">Cancelar</a>
+  </div>
 </form>
 {% endblock %}

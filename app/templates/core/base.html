@@ -5,19 +5,211 @@
   <title>{{ APPLICATION_NAME }} · {{ APPLICATION_VERSION }}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#f6f7fb;color:#182033}
-    header{background:#111827;color:#fff;padding:14px 24px;display:flex;justify-content:space-between}
-    nav a{color:#dbeafe;margin-right:16px;text-decoration:none;font-weight:600}
-    main{padding:24px}.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
-    .card{background:#fff;border:1px solid #d8dee9;border-radius:14px;padding:18px;box-shadow:0 8px 20px rgba(15,23,42,.06)}
-    table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden}
-    th,td{padding:10px 12px;border-bottom:1px solid #e5e7eb;text-align:left}
-    th{background:#eef2ff}.pill{display:inline-block;border-radius:999px;padding:3px 9px;font-size:.82rem;background:#e0f2fe;color:#075985}.pill-ok{background:#dcfce7;color:#166534}.pill-warn{background:#fef3c7;color:#92400e}
+    :root{
+      --bg:#f4f6fb;
+      --surface:#ffffff;
+      --surface-soft:#f8fafc;
+      --border:#d8dee9;
+      --border-soft:#e5e7eb;
+      --text:#111827;
+      --muted:#64748b;
+      --primary:#2563eb;
+      --primary-dark:#1d4ed8;
+      --nav:#0f172a;
+      --success-bg:#dcfce7;
+      --success-text:#166534;
+      --warn-bg:#fef3c7;
+      --warn-text:#92400e;
+      --danger-bg:#fee2e2;
+      --danger-text:#991b1b;
+      --shadow:0 14px 32px rgba(15,23,42,.08);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:linear-gradient(180deg,#f7f9fc 0%,var(--bg) 100%);
+      color:var(--text);
+      font-size:15px;
+    }
+    header{
+      background:var(--nav);
+      color:#fff;
+      padding:0 24px;
+      height:46px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      box-shadow:0 1px 0 rgba(255,255,255,.08);
+    }
+    header strong{font-size:15px}
+    header span{font-size:13px;color:#cbd5e1;margin-left:4px}
+    nav{display:flex;gap:4px;align-items:center}
+    nav a{
+      color:#e0f2fe;
+      text-decoration:none;
+      font-weight:650;
+      padding:10px 10px;
+      border-radius:9px;
+    }
+    nav a:hover{background:rgba(255,255,255,.08)}
+    main{
+      max-width:1180px;
+      margin:0 auto;
+      padding:34px 24px 56px;
+    }
+    .page-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:20px;
+      margin-bottom:20px;
+    }
+    .page-title{margin:0 0 8px;font-size:30px;line-height:1.1;letter-spacing:-.03em}
+    .page-subtitle{margin:0;color:var(--muted);max-width:780px}
+    .toolbar{display:flex;gap:10px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+    .card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+    .card{
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:18px;
+      box-shadow:var(--shadow);
+    }
+    .notice{
+      background:#eff6ff;
+      color:#1e3a8a;
+      border:1px solid #bfdbfe;
+      border-radius:14px;
+      padding:14px 16px;
+      margin:14px 0 18px;
+    }
+    .notice strong{font-weight:750}
+    .notice.warn{
+      background:var(--warn-bg);
+      color:var(--warn-text);
+      border-color:#fde68a;
+    }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      min-height:38px;
+      padding:9px 14px;
+      border-radius:10px;
+      border:1px solid transparent;
+      font-weight:700;
+      text-decoration:none;
+      cursor:pointer;
+      font-family:inherit;
+      font-size:14px;
+    }
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-primary:hover{background:var(--primary-dark)}
+    .btn-secondary{background:#fff;color:#334155;border-color:var(--border)}
+    .btn-secondary:hover{background:#f8fafc}
+    .table-card{
+      background:var(--surface);
+      border:1px solid var(--border-soft);
+      border-radius:16px;
+      overflow:hidden;
+      box-shadow:var(--shadow);
+    }
+    table{width:100%;border-collapse:collapse;background:var(--surface)}
+    th,td{padding:13px 14px;border-bottom:1px solid var(--border-soft);text-align:left;vertical-align:middle}
+    th{background:#eef2ff;color:#0f172a;font-size:13px;text-transform:uppercase;letter-spacing:.035em}
+    tr:last-child td{border-bottom:0}
+    tbody tr:hover{background:#f8fafc}
+    .empty-state{
+      padding:28px;
+      text-align:center;
+      color:var(--muted);
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      border-radius:999px;
+      padding:4px 10px;
+      font-size:12px;
+      font-weight:750;
+      line-height:1;
+      background:#e0f2fe;
+      color:#075985;
+      border:1px solid rgba(14,116,144,.15);
+      white-space:nowrap;
+    }
+    .pill-ok{background:var(--success-bg);color:var(--success-text);border-color:#bbf7d0}
+    .pill-warn{background:var(--warn-bg);color:var(--warn-text);border-color:#fde68a}
+    .pill-muted{background:#f1f5f9;color:#475569;border-color:#e2e8f0}
+    .form-card{
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:22px;
+      box-shadow:var(--shadow);
+      max-width:860px;
+    }
+    .form-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:18px 20px;
+      margin-top:18px;
+    }
+    .field{display:flex;flex-direction:column;gap:7px}
+    .field-full{grid-column:1 / -1}
+    label{font-weight:750;color:#1f2937}
+    input[type="text"],input[type="url"],select,textarea{
+      width:100%;
+      border:1px solid #cbd5e1;
+      border-radius:10px;
+      padding:10px 11px;
+      font:inherit;
+      background:#fff;
+      color:var(--text);
+      outline:none;
+    }
+    input:focus,select:focus,textarea:focus{
+      border-color:var(--primary);
+      box-shadow:0 0 0 3px rgba(37,99,235,.13);
+    }
+    textarea{min-height:112px;resize:vertical}
+    .help{font-size:13px;color:var(--muted);line-height:1.35}
+    .check-row{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      background:var(--surface-soft);
+      border:1px solid var(--border-soft);
+      border-radius:12px;
+      padding:12px;
+    }
+    .check-row input{margin-top:2px}
+    .form-actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      margin-top:22px;
+      padding-top:18px;
+      border-top:1px solid var(--border-soft);
+    }
+    .messages{margin:0 0 18px;padding:0;list-style:none}
+    .messages li{padding:12px 14px;border-radius:12px;margin-bottom:8px;background:#eff6ff;border:1px solid #bfdbfe}
+    a{color:#1d4ed8}
+    @media (max-width:760px){
+      header{height:auto;align-items:flex-start;padding:12px 16px;gap:10px;flex-direction:column}
+      nav{flex-wrap:wrap}
+      main{padding:24px 14px 44px}
+      .page-head{flex-direction:column}
+      .toolbar{justify-content:flex-start}
+      .form-grid{grid-template-columns:1fr}
+      th,td{padding:10px}
+    }
   </style>
 </head>
 <body>
 <header>
-  <div><strong>{{ APPLICATION_NAME }}</strong> <span style="opacity:.75">{{ APPLICATION_VERSION }}</span></div>
+  <div><strong>{{ APPLICATION_NAME }}</strong> <span>{{ APPLICATION_VERSION }}</span></div>
   <nav>
     <a href="/app/">Inicio</a>
     <a href="/app/activos/">Activos</a>
@@ -26,6 +218,15 @@
     <a href="/admin/">Admin</a>
   </nav>
 </header>
-<main>{% block content %}{% endblock %}</main>
+<main>
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+  {% block content %}{% endblock %}
+</main>
 </body>
 </html>

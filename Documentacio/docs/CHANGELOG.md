@@ -1,5 +1,17 @@
 # CHANGELOG — AuditorSecSuite_PRE
 
+## v0.2.1-pre — mejora visual de activos
+
+### Mejorado
+- Base visual inicial en `core/base.html`: cabecera, layout, botones, tarjetas, tablas, formularios y chips semánticos.
+- Listado de activos con acción principal, empty state y estados visuales más claros.
+- Formulario de activos con card, grid, ayudas y controles de autorización más legibles.
+
+### Validación
+- Validación técnica OK.
+- Smoke HTTP UX OK.
+- Revisión visual del usuario: mejora aceptada.
+
 ## v0.2.0-pre — inventario de activos autorizados
 
 ### Añadido

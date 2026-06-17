@@ -1,51 +1,68 @@
 {% extends "core/base.html" %}
 {% block content %}
-<h1>Activos</h1>
-
-<p>Inventario interno de activos propios o con autorización explícita.</p>
-
-<p>
-  <a href="{% url "asset_create" %}">Nuevo activo</a>
-</p>
+<section class="page-head">
+  <div>
+    <h1 class="page-title">Activos</h1>
+    <p class="page-subtitle">Inventario interno de activos propios o con autorización explícita. Los activos no autorizados quedan visibles, pero no deben usarse para auditorías.</p>
+  </div>
+  <div class="toolbar">
+    <a class="btn btn-primary" href="{% url "asset_create" %}">+ Nuevo activo</a>
+  </div>
+</section>
 
 {% if unauthorized_count %}
-  <div class="card">
+  <div class="notice warn">
     <strong>Atención:</strong> hay {{ unauthorized_count }} activo(s) sin autorización. No deben usarse para auditorías.
   </div>
 {% endif %}
 
-<table>
-  <thead>
-    <tr>
-      <th>Nombre</th>
-      <th>Tipo</th>
-      <th>Valor</th>
-      <th>Entorno</th>
-      <th>Autorizado</th>
-      <th>Activo</th>
-      <th>Acciones</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for asset in assets %}
+<div class="table-card">
+  <table>
+    <thead>
       <tr>
-        <td>{{ asset.nombre }}</td>
-        <td>{{ asset.get_tipo_display }}</td>
-        <td>{{ asset.valor }}</td>
-        <td>{{ asset.entorno|default:"-" }}</td>
-        <td>
-          {% if asset.autorizado %}
-            <span class="pill pill-ok">Autorizado</span>
-          {% else %}
-            <span class="pill pill-warn">No autorizado</span>
-          {% endif %}
-        </td>
-        <td>{{ asset.activo|yesno:"Sí,No" }}</td>
-        <td><a href="{% url "asset_update" asset.pk %}">Editar</a></td>
+        <th>Nombre</th>
+        <th>Tipo</th>
+        <th>Valor</th>
+        <th>Entorno</th>
+        <th>Autorizado</th>
+        <th>Activo</th>
+        <th>Acciones</th>
       </tr>
-    {% empty %}
-      <tr><td colspan="7">Sin activos registrados.</td></tr>
-    {% endfor %}
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      {% for asset in assets %}
+        <tr>
+          <td><strong>{{ asset.nombre }}</strong></td>
+          <td>{{ asset.get_tipo_display }}</td>
+          <td>{{ asset.valor }}</td>
+          <td>{{ asset.entorno|default:"-" }}</td>
+          <td>
+            {% if asset.autorizado %}
+              <span class="pill pill-ok">Autorizado</span>
+            {% else %}
+              <span class="pill pill-warn">No autorizado</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if asset.activo %}
+              <span class="pill pill-ok">Activo</span>
+            {% else %}
+              <span class="pill pill-muted">Inactivo</span>
+            {% endif %}
+          </td>
+          <td><a class="btn btn-secondary" href="{% url "asset_update" asset.pk %}">Editar</a></td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="7">
+            <div class="empty-state">
+              <strong>Sin activos registrados.</strong><br>
+              Crea el primer activo para empezar a construir el inventario interno.
+            </div>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock %}

@@ -10,3 +10,9 @@ El campo `Autorizado` debe marcarse únicamente cuando el activo sea propio o ex
 
 Pendiente de captura: pantalla del listado de activos con activos autorizados y no autorizados.
 Pendiente de captura: pantalla del formulario de alta/edición de activo.
+
+### Validación visual UX 1
+
+La interfaz de `Activos` se ha mejorado visualmente tras revisión: listado con acción principal, tabla refinada, chips semánticos y formulario en tarjeta con estructura más clara.
+
+Pendiente de incorporar capturas definitivas si se decide generar documentación visual completa.
