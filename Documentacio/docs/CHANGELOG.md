@@ -1,5 +1,16 @@
 # CHANGELOG — AuditorSecSuite_PRE
 
+## v0.1.2-pre — CI público mínimo
+
+### Añadido
+- Workflow público `.github/workflows/ci.yml`.
+- Validación CI con Django check, migraciones, tests, validadores documentales, `security_audit.sh`, `gitleaks` y `trufflehog`.
+
+### Límites
+- No se activa todavía branch protection.
+- No se añaden todavía plantillas de issue/PR ni licencia.
+- No se integran motores de escaneo.
+
 ## v0.1.1-pre — publicación pública controlada
 
 ### Añadido

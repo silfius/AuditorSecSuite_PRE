@@ -1,0 +1,71 @@
+name: ci
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: auditorsecsuite_pre
+          POSTGRES_USER: auditorsecsuite_pre
+          POSTGRES_PASSWORD: auditorsecsuite_pre_ci_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U auditorsecsuite_pre -d auditorsecsuite_pre"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      APP_INSTANCE_ID: auditorsecsuite_pre
+      APP_DEBUG: "1"
+      APP_ALLOWED_HOSTS: localhost,127.0.0.1
+      DJANGO_SECRET_KEY: ci-only-placeholder-key
+      POSTGRES_DB: auditorsecsuite_pre
+      POSTGRES_USER: auditorsecsuite_pre
+      POSTGRES_PASSWORD: auditorsecsuite_pre_ci_password
+      DATABASE_HOST: 127.0.0.1
+      DATABASE_PORT: "5432"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: python -m pip install --upgrade pip
+
+      - run: pip install -r requirements.txt
+
+      - working-directory: app
+        run: python manage.py check
+
+      - working-directory: app
+        run: python manage.py makemigrations --check --dry-run
+
+      - working-directory: app
+        run: python manage.py test core
+
+      - run: ./Documentacio/scripts/security_audit.sh
+
+      - run: ./Documentacio/scripts/verify_documentation_alignment.sh
+
+      - run: ./Documentacio/scripts/verify_project_alignment.sh
+
+      - run: docker run --rm -v "$PWD:/repo:ro" zricethezav/gitleaks:latest detect --source=/repo --redact --verbose
+
+      - run: docker run --rm -v "$PWD:/repo:ro" trufflesecurity/trufflehog:latest git file:///repo --no-update --fail --only-verified
