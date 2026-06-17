@@ -577,3 +577,180 @@ class DetailViewsTests(TestCase):
         finding_response = self.client.get(reverse("finding_list"))
         self.assertEqual(finding_response.status_code, 200)
         self.assertContains(finding_response, reverse("finding_detail", args=[self.finding.pk]))
+
+
+
+from datetime import date as _safe_date
+from pathlib import Path as _SafePath
+from uuid import uuid4 as _safe_uuid4
+from django.contrib.auth import get_user_model as _safe_get_user_model
+from django.core.exceptions import ValidationError as _SafeValidationError
+from django.db import models as _safe_django_models
+from django.urls import reverse as _safe_reverse
+from .models import CheckDefinition, AuditCheckPlan
+from .forms import AuditCheckPlanForm
+
+
+_SAFE_CORE_DIR = _SafePath(__file__).resolve().parent
+
+
+class SafeCheckPlanningTests(TestCase):
+    def setUp(self):
+        self.user = _safe_get_user_model().objects.create_user(
+            username=f"user-{_safe_uuid4().hex[:8]}",
+            password="test-pass-12345",
+        )
+        self.client.force_login(self.user)
+
+        self.asset = self._create_instance(Activo, "asset")
+        self._force_asset_auditable(self.asset)
+
+        self.audit = self._create_instance(Auditoria, "audit")
+        AuditoriaActivo.objects.create(auditoria=self.audit, activo=self.asset)
+
+        self.check_definition = CheckDefinition.objects.create(
+            codigo=f"tls-expiry-{_safe_uuid4().hex[:8]}",
+            nombre="Caducidad de certificado TLS",
+            descripcion="Check declarativo sin ejecución técnica.",
+            categoria=CheckDefinition.CATEGORY_TLS,
+            engine_key=CheckDefinition.ENGINE_MANUAL,
+            nivel_riesgo_operativo=CheckDefinition.RISK_PASSIVE,
+            is_enabled=True,
+        )
+
+    def _field_value(self, field, prefix):
+        if getattr(field, "choices", None):
+            for value, _label in field.choices:
+                if value not in ("", None):
+                    return value
+
+        if isinstance(field, (_safe_django_models.CharField, _safe_django_models.SlugField)):
+            return f"{prefix}-{field.name}-{_safe_uuid4().hex[:8]}"[: field.max_length or 80]
+        if isinstance(field, _safe_django_models.TextField):
+            return f"{prefix}-{field.name}"
+        if isinstance(field, _safe_django_models.BooleanField):
+            return True
+        if isinstance(field, _safe_django_models.DateTimeField):
+            from django.utils import timezone
+            return timezone.now()
+        if isinstance(field, _safe_django_models.DateField):
+            return _safe_date.today()
+        if isinstance(field, _safe_django_models.IntegerField):
+            return 1
+        return None
+
+    def _create_instance(self, model, prefix):
+        data = {}
+        for field in model._meta.fields:
+            if field.auto_created or field.primary_key:
+                continue
+            if field.has_default() or field.null or field.blank:
+                continue
+            if isinstance(field, _safe_django_models.ForeignKey):
+                if field.remote_field.model == _safe_get_user_model():
+                    data[field.name] = self.user
+                continue
+            value = self._field_value(field, prefix)
+            if value is not None:
+                data[field.name] = value
+        return model.objects.create(**data)
+
+    def _force_asset_auditable(self, asset):
+        for field in asset._meta.fields:
+            if isinstance(field, _safe_django_models.BooleanField):
+                setattr(asset, field.name, True)
+        asset.save()
+        self.assertTrue(asset.puede_auditarse())
+
+    def test_plan_requires_asset_linked_to_audit(self):
+        other_asset = self._create_instance(Activo, "other")
+        self._force_asset_auditable(other_asset)
+
+        plan = AuditCheckPlan(
+            auditoria=self.audit,
+            activo=other_asset,
+            check_definition=self.check_definition,
+        )
+
+        with self.assertRaises(_SafeValidationError):
+            plan.full_clean()
+
+    def test_plan_rejects_non_auditable_asset(self):
+        changed = False
+        for field in self.asset._meta.fields:
+            if isinstance(field, _safe_django_models.BooleanField):
+                setattr(self.asset, field.name, False)
+                changed = True
+                break
+
+        if not changed:
+            self.skipTest("Activo no tiene booleanos para forzar no auditable.")
+
+        self.asset.save()
+
+        if self.asset.puede_auditarse():
+            self.skipTest("No se pudo forzar un activo no auditable con el esquema actual.")
+
+        plan = AuditCheckPlan(
+            auditoria=self.audit,
+            activo=self.asset,
+            check_definition=self.check_definition,
+        )
+
+        with self.assertRaises(_SafeValidationError):
+            plan.full_clean()
+
+    def test_intrusive_checks_are_not_plannable(self):
+        intrusive = CheckDefinition.objects.create(
+            codigo=f"intrusive-{_safe_uuid4().hex[:8]}",
+            nombre="Check intrusivo bloqueado",
+            categoria=CheckDefinition.CATEGORY_INFRA,
+            engine_key=CheckDefinition.ENGINE_NOOP,
+            nivel_riesgo_operativo=CheckDefinition.RISK_INTRUSIVE,
+            is_enabled=True,
+        )
+
+        form = AuditCheckPlanForm(
+            data={
+                "check_definition": intrusive.pk,
+                "activo": self.asset.pk,
+                "estado": AuditCheckPlan.STATE_PLANNED,
+                "motivo_bloqueo": "",
+            },
+            auditoria=self.audit,
+        )
+
+        self.assertFalse(form.is_valid())
+
+    def test_authenticated_user_can_create_safe_check_plan(self):
+        url = _safe_reverse("core_audit_check_plan_create", args=[self.audit.pk])
+        response = self.client.post(
+            url,
+            {
+                "check_definition": self.check_definition.pk,
+                "activo": self.asset.pk,
+                "estado": AuditCheckPlan.STATE_PLANNED,
+                "motivo_bloqueo": "",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(
+            AuditCheckPlan.objects.filter(
+                auditoria=self.audit,
+                activo=self.asset,
+                check_definition=self.check_definition,
+            ).exists()
+        )
+
+    def test_safe_check_layer_has_no_execution_primitives(self):
+        source = "\n".join(
+            [
+                (_SAFE_CORE_DIR / "models.py").read_text(encoding="utf-8"),
+                (_SAFE_CORE_DIR / "forms.py").read_text(encoding="utf-8"),
+                (_SAFE_CORE_DIR / "views.py").read_text(encoding="utf-8"),
+            ]
+        )
+
+        for fragment in ["subprocess.", "Popen(", "os.system(", "requests.", "socket."]:
+            self.assertNotIn(fragment, source)

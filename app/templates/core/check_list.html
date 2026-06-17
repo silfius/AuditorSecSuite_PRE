@@ -1,0 +1,48 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<section class="card">
+  <div class="toolbar">
+    <div>
+      <h1>Checks seguros</h1>
+      <p>Catálogo declarativo. No ejecuta motores ni acciones técnicas.</p>
+    </div>
+    <a class="button" href="{% url 'core_check_create' %}">Nuevo check</a>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Nombre</th>
+        <th>Categoría</th>
+        <th>Motor futuro</th>
+        <th>Riesgo</th>
+        <th>Estado</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for check in checks %}
+        <tr>
+          <td><code>{{ check.codigo }}</code></td>
+          <td>{{ check.nombre }}</td>
+          <td>{{ check.get_categoria_display }}</td>
+          <td>{{ check.get_engine_key_display }}</td>
+          <td><span class="chip">{{ check.get_nivel_riesgo_operativo_display }}</span></td>
+          <td>
+            {% if check.is_enabled %}
+              <span class="chip ok">Activo</span>
+            {% else %}
+              <span class="chip muted">Inactivo</span>
+            {% endif %}
+          </td>
+          <td><a class="button secondary" href="{% url 'core_check_update' check.pk %}">Editar</a></td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="7">No hay checks definidos todavía.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

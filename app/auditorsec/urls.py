@@ -20,4 +20,11 @@ urlpatterns = [
     path("app/findings/<int:pk>/editar/", views.finding_update, name="finding_update"),
     path("app/findings/<int:pk>/", views.finding_detail, name="finding_detail"),
     path("admin/", admin.site.urls),
+
+path("app/checks/", views.check_list, name="core_check_list"),
+path("app/checks/nuevo/", views.check_create, name="core_check_create"),
+path("app/checks/<int:pk>/editar/", views.check_update, name="core_check_update"),
+path("app/auditorias/<int:audit_pk>/checks/nuevo/", views.audit_check_plan_create, name="core_audit_check_plan_create"),
+path("app/auditorias/<int:audit_pk>/checks/<int:plan_pk>/omitir/", views.audit_check_plan_omit, name="core_audit_check_plan_omit"),
+
 ]

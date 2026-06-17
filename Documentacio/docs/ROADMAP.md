@@ -24,3 +24,7 @@ Se avanza en detalle de auditorías y findings antes de diseñar checks/motores 
 ### 2026-06-17 — Bloque cerrado: detalles operativos
 
 Cerrado el detalle operativo de auditorías y findings. El proyecto queda preparado para estudiar el siguiente paso: checks controlados, simulados o motores seguros, siempre sobre auditorías y activos autorizados.
+
+### 2026-06-17 — Bloque 7A — checks seguros planificados
+
+Se inicia la capa de checks seguros sin ejecución. El objetivo es definir y planificar controles técnicos de forma declarativa antes de integrar cualquier motor real.

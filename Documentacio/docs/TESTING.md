@@ -58,3 +58,40 @@ Validaciones ejecutadas para cierre `v0.2.6-pre`:
 - Smoke HTTP autenticado de `audit_detail` y `finding_detail`.
 - Validación de enlaces `Ver` desde listados.
 - Validación visual aceptada por el usuario.
+
+## Checks seguros planificados
+
+Cobertura prevista/ejecutada: `SafeCheckPlanningTests` valida que solo se puedan planificar checks sobre activos auditables vinculados a la auditoría, que los checks intrusivos queden bloqueados y que el código de esta capa no contenga primitivas de ejecución técnica (`subprocess`, `os.system`, `requests`, `socket`).
+
+<!-- AUDITORSECSUITE_SAFE_CHECKS_7A_VALIDATION_20260617 -->
+### Evidencia de validación — checks seguros planificados sin ejecución real
+
+Fecha: 2026-06-17.
+
+Bloque funcional cerrado: catálogo y planificación de checks seguros, sin ejecución técnica.
+
+Evidencias ejecutadas:
+
+- Web recuperada y saludable: `/health/` respondió 200 tras rebuild con espera robusta.
+- Migración aplicada: `core.0002_checkdefinition_auditcheckplan`.
+- `python manage.py check`: OK.
+- `python manage.py makemigrations --check --dry-run`: OK.
+- `python manage.py test core.tests.SafeCheckPlanningTests -v 2`: 5 tests OK.
+- `python manage.py test core -v 2`: 40 tests OK.
+- Auditoría anti-ejecución: sin `subprocess`, `os.system`, `Popen`, `requests.` ni `socket.` en modelos/forms/views/templates del bloque.
+- Security audit: `OK_SECURITY_AUDIT=1`.
+- Validadores documentales/proyecto: `OK_DOCUMENTATION_ALIGNMENT=1` y `OK_PROJECT_ALIGNMENT=1`.
+- Smoke funcional autenticado:
+  - listado de checks: HTTP 200.
+  - formulario de check: HTTP 200.
+  - formulario de planificación: HTTP 200.
+  - creación de check declarativo: HTTP 302.
+  - planificación de check: HTTP 302.
+  - detalle de auditoría: HTTP 200.
+  - el detalle muestra “Checks planificados”, nombre y código del check.
+  - `FINDINGS_BEFORE=3` y `FINDINGS_AFTER=3`.
+  - `NO_AUTOMATIC_FINDINGS_CREATED=1`.
+  - `NO_ENGINE_EXECUTION_TRIGGERED=1`.
+  - `SMOKE_CLEANUP_OK=1`, sin residuos de smoke.
+
+Conclusión: la capa queda validada como planificación declarativa/controlada, sin motor real, sin red, sin comandos y sin creación automática de findings.

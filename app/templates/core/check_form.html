@@ -1,0 +1,21 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<section class="card">
+  <div class="toolbar">
+    <div>
+      <h1>{{ title }}</h1>
+      <p>Definición segura y declarativa. No introduzcas comandos ni parámetros ejecutables.</p>
+    </div>
+    <a class="button secondary" href="{% url 'core_check_list' %}">Volver</a>
+  </div>
+
+  <form method="post" class="form-grid">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="form-actions">
+      <button class="button" type="submit">Guardar</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

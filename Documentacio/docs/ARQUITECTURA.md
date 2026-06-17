@@ -27,3 +27,9 @@ Las vistas de detalle son de lectura operativa y mantienen `login_required`. `au
 ### Cierre detalle operativo `v0.2.6-pre`
 
 Las vistas `audit_detail` y `finding_detail` consolidan una capa de trazabilidad de lectura. Se mantiene separación estricta entre visualización operativa y ejecución técnica: ninguna vista de detalle ejecuta motores ni automatismos.
+
+## Checks seguros planificados
+
+`CheckDefinition` define checks técnicos de forma declarativa. `AuditCheckPlan` permite planificar checks sobre una auditoría y un activo vinculado/autorizado.
+
+Esta capa no ejecuta motores, no contiene comandos y no realiza llamadas de red. Su función es preparar el control operativo previo a futuras integraciones técnicas.

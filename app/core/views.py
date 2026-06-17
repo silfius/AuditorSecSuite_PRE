@@ -5,6 +5,10 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import ActivoForm, AuditoriaForm, FindingForm
 from .models import Activo, Auditoria, AuditoriaActivo, Finding
+from django.urls import NoReverseMatch, reverse
+from django.views.decorators.http import require_POST
+from .models import CheckDefinition, AuditCheckPlan
+from .forms import CheckDefinitionForm, AuditCheckPlanForm
 
 
 def health(request):
@@ -126,20 +130,24 @@ def audit_update(request, pk):
 
 @login_required
 def audit_detail(request, pk):
-    audit = get_object_or_404(
-        Auditoria.objects.select_related("creado_por").prefetch_related(
-            "auditoria_activos__activo",
-            "findings__activo",
-        ),
-        pk=pk,
+    auditoria = get_object_or_404(Auditoria, pk=pk)
+    auditoria_activos = AuditoriaActivo.objects.select_related("activo").filter(auditoria=auditoria)
+    findings = Finding.objects.select_related("activo").filter(auditoria=auditoria)
+    check_plans = AuditCheckPlan.objects.select_related("check_definition", "activo").filter(auditoria=auditoria)
+
+    return render(
+        request,
+        "core/audit_detail.html",
+        {
+            "audit": auditoria,
+            "auditoria": auditoria,
+            "auditoria_activos": auditoria_activos,
+            "asset_links": auditoria_activos,
+            "audit_assets": auditoria_activos,
+            "findings": findings,
+            "check_plans": check_plans,
+        },
     )
-    asset_links = audit.auditoria_activos.select_related("activo").order_by("activo__nombre")
-    findings = audit.findings.select_related("activo").order_by("-creado_en", "titulo")
-    return render(request, "core/audit_detail.html", {
-        "audit": audit,
-        "asset_links": asset_links,
-        "findings": findings,
-    })
 
 @login_required
 def finding_list(request):
@@ -210,3 +218,79 @@ def finding_update(request, pk):
         "title": "Editar finding",
         "submit_label": "Guardar finding",
     })
+
+
+
+def _redirect_to_audit_detail(auditoria):
+    for url_name in ("core_audit_detail", "audit_detail"):
+        try:
+            return redirect(reverse(url_name, args=[auditoria.pk]))
+        except NoReverseMatch:
+            continue
+    return redirect("/app/auditorias/")
+
+
+@login_required
+def check_list(request):
+    checks = CheckDefinition.objects.all()
+    return render(request, "core/check_list.html", {"checks": checks})
+
+
+@login_required
+def check_create(request):
+    if request.method == "POST":
+        form = CheckDefinitionForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("core_check_list")
+    else:
+        form = CheckDefinitionForm()
+    return render(request, "core/check_form.html", {"form": form, "title": "Nuevo check seguro"})
+
+
+@login_required
+def check_update(request, pk):
+    check = get_object_or_404(CheckDefinition, pk=pk)
+    if request.method == "POST":
+        form = CheckDefinitionForm(request.POST, instance=check)
+        if form.is_valid():
+            form.save()
+            return redirect("core_check_list")
+    else:
+        form = CheckDefinitionForm(instance=check)
+    return render(request, "core/check_form.html", {"form": form, "title": "Editar check seguro"})
+
+
+@login_required
+def audit_check_plan_create(request, audit_pk):
+    auditoria = get_object_or_404(Auditoria, pk=audit_pk)
+    if request.method == "POST":
+        form = AuditCheckPlanForm(request.POST, auditoria=auditoria)
+        if form.is_valid():
+            plan = form.save(commit=False)
+            plan.auditoria = auditoria
+            plan.creado_por = request.user
+            plan.save()
+            return _redirect_to_audit_detail(auditoria)
+    else:
+        form = AuditCheckPlanForm(auditoria=auditoria)
+
+    return render(
+        request,
+        "core/audit_check_plan_form.html",
+        {
+            "form": form,
+            "auditoria": auditoria,
+            "title": "Planificar check seguro",
+        },
+    )
+
+
+@login_required
+@require_POST
+def audit_check_plan_omit(request, audit_pk, plan_pk):
+    auditoria = get_object_or_404(Auditoria, pk=audit_pk)
+    plan = get_object_or_404(AuditCheckPlan, pk=plan_pk, auditoria=auditoria)
+    plan.estado = AuditCheckPlan.STATE_OMITTED
+    plan.save()
+    return _redirect_to_audit_detail(auditoria)
