@@ -1,5 +1,13 @@
 # CHANGELOG — AuditorSecSuite_PRE
 
+## v0.1.5-pre — LICENSE raíz conservadora
+
+### Añadido
+- `LICENSE` raíz con reserva de derechos.
+
+### Decisión
+- El repositorio es público, pero no se concede todavía licencia open source.
+
 ## v0.1.4-pre — contrato real de publication preflight
 
 ### Corregido
