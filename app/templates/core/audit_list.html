@@ -1,0 +1,11 @@
+{% extends "core/base.html" %}
+{% block content %}
+<h1>Auditorías</h1>
+<table><thead><tr><th>Nombre</th><th>Perfil</th><th>Estado</th><th>Creada</th></tr></thead><tbody>
+{% for audit in audits %}
+<tr><td>{{ audit.nombre }}</td><td>{{ audit.get_perfil_display }}</td><td><span class="pill">{{ audit.get_estado_display }}</span></td><td>{{ audit.creado_en }}</td></tr>
+{% empty %}
+<tr><td colspan="4">Sin auditorías registradas.</td></tr>
+{% endfor %}
+</tbody></table>
+{% endblock %}

@@ -1,0 +1,16 @@
+.env
+*.pyc
+__pycache__/
+.pytest_cache/
+.coverage
+htmlcov/
+storage/
+logs/
+tmp/
+*.log
+*.dump
+*.sql
+*.sqlite3
+Documentacio/docs/_doc_offline/
+Documentacio/_doc_offline/
+scripts/backups/

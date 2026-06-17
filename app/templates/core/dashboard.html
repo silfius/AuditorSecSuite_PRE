@@ -1,0 +1,10 @@
+{% extends "core/base.html" %}
+{% block content %}
+<h1>Panel interno de auditoría técnica</h1>
+<p>Herramienta interna para inventario, auditorías controladas, findings e informes.</p>
+<div class="card-grid">
+  <div class="card"><h2>Activos</h2><p style="font-size:2rem">{{ asset_count }}</p></div>
+  <div class="card"><h2>Auditorías</h2><p style="font-size:2rem">{{ audit_count }}</p></div>
+  <div class="card"><h2>Findings</h2><p style="font-size:2rem">{{ finding_count }}</p></div>
+</div>
+{% endblock %}

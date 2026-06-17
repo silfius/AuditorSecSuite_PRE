@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>{{ APPLICATION_NAME }} · {{ APPLICATION_VERSION }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#f6f7fb;color:#182033}
+    header{background:#111827;color:#fff;padding:14px 24px;display:flex;justify-content:space-between}
+    nav a{color:#dbeafe;margin-right:16px;text-decoration:none;font-weight:600}
+    main{padding:24px}.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+    .card{background:#fff;border:1px solid #d8dee9;border-radius:14px;padding:18px;box-shadow:0 8px 20px rgba(15,23,42,.06)}
+    table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden}
+    th,td{padding:10px 12px;border-bottom:1px solid #e5e7eb;text-align:left}
+    th{background:#eef2ff}.pill{display:inline-block;border-radius:999px;padding:3px 9px;font-size:.82rem;background:#e0f2fe;color:#075985}
+  </style>
+</head>
+<body>
+<header>
+  <div><strong>{{ APPLICATION_NAME }}</strong> <span style="opacity:.75">{{ APPLICATION_VERSION }}</span></div>
+  <nav>
+    <a href="/app/">Inicio</a>
+    <a href="/app/activos/">Activos</a>
+    <a href="/app/auditorias/">Auditorías</a>
+    <a href="/app/findings/">Findings</a>
+    <a href="/admin/">Admin</a>
+  </nav>
+</header>
+<main>{% block content %}{% endblock %}</main>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{% extends "core/base.html" %}
+{% block content %}
+<h1>Findings</h1>
+<table><thead><tr><th>Título</th><th>Activo</th><th>Auditoría</th><th>Severidad</th><th>Estado</th></tr></thead><tbody>
+{% for finding in findings %}
+<tr><td>{{ finding.titulo }}</td><td>{{ finding.activo }}</td><td>{{ finding.auditoria }}</td><td><span class="pill">{{ finding.get_severidad_display }}</span></td><td>{{ finding.get_estado_display }}</td></tr>
+{% empty %}
+<tr><td colspan="5">Sin findings registrados.</td></tr>
+{% endfor %}
+</tbody></table>
+{% endblock %}

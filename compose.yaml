@@ -1,0 +1,52 @@
+name: auditorsecsuite_pre
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: auditorsecsuite_pre_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-auditorsecsuite_pre}
+      POSTGRES_USER: ${POSTGRES_USER:-auditorsecsuite_pre}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - auditorsecsuite_pre_pgdata:/var/lib/postgresql/data
+    networks:
+      - auditorsecsuite_pre_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-auditorsecsuite_pre} -d ${POSTGRES_DB:-auditorsecsuite_pre}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: local/auditorsecsuite-pre-app:latest
+    container_name: auditorsecsuite_pre_app
+    restart: unless-stopped
+    env_file:
+      - .env
+    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+    volumes:
+      - ./storage:/storage
+    ports:
+      - "${APP_PORT:-58780}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - auditorsecsuite_pre_net
+    logging:
+      driver: json-file
+      options:
+        max-size: "30m"
+        max-file: "3"
+
+volumes:
+  auditorsecsuite_pre_pgdata:
+
+networks:
+  auditorsecsuite_pre_net:
+    name: auditorsecsuite_pre_net
