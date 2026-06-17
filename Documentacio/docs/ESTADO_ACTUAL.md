@@ -49,3 +49,7 @@ Se implementa carga dinámica de activos auditables al seleccionar auditoría en
 ## Bloque 4C — cierre selector dinámico Findings
 
 El selector dinámico de activos en Findings queda validado técnica y visualmente. Al escoger una auditoría, el campo Activo carga únicamente activos auditables vinculados a esa auditoría. Versión de cierre: `v0.2.4-pre`.
+
+## Bloque 5A — preflight canónico de publicación
+
+Se normaliza el cierre de publicación creando `./publication_preflight.sh` como ruta canónica. El objetivo es evitar falsos bloqueos por rutas inexistentes y centralizar las comprobaciones antes de `git push`. Versión: `v0.2.5-pre`.

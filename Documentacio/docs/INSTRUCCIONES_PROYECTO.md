@@ -13,3 +13,7 @@ Los cambios documentales menores, ajustes preparatorios y subpasos internos debe
 Las propuestas del usuario no deben aceptarse automáticamente. Deben evaluarse con criterio técnico, funcional, de seguridad y mantenibilidad.
 
 Se dará la razón al usuario cuando la propuesta sea correcta o cuando no exista una alternativa claramente mejor. Si existe una opción más segura, más simple, más robusta o más inteligente, debe proponerse y justificarse antes de ejecutar.
+
+## Ruta canónica de preflight
+
+La ruta canónica de preflight de publicación es `./publication_preflight.sh`, ejecutada desde la raíz del repositorio. Los bloques de cierre no deben llamar a un script inexistente ni asumir otra ubicación sin diagnóstico previo.

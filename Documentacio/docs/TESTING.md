@@ -31,3 +31,13 @@ Validaciones ejecutadas para cierre `v0.2.4-pre`:
 - `git diff --check`.
 - Smoke HTTP autenticado del endpoint dinámico y del formulario de findings.
 - Validación visual aceptada por el usuario.
+
+## Validación de preflight de publicación
+
+`publication_preflight.sh` debe validarse con:
+
+- `bash -n publication_preflight.sh`.
+- Ejecución directa `./publication_preflight.sh`.
+- Security audit.
+- Validadores de documentación/proyecto.
+- `git diff --check` y `git diff --cached --check`.

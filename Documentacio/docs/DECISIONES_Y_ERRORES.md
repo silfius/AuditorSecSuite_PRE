@@ -19,3 +19,7 @@ También se establece que el asistente debe actuar de forma crítica ante las de
 ## Finding manual antes de motores
 
 Antes de integrar motores técnicos se implementan findings manuales revisables. Esto permite consolidar auditoría, activo, severidad, estado y recomendación sin depender de resultados automáticos ni ejecutar acciones técnicas.
+
+## 2026-06-17 — Preflight raíz canónico
+
+Se detectó un falso bloqueo tras commit porque el bloque de cierre invocó `./publication_preflight.sh` y el fichero no existía en raíz. Se decide crear ese wrapper como ruta canónica, manteniendo dentro las comprobaciones de seguridad, documentación, proyecto y whitespace.

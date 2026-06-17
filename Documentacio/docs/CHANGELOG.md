@@ -1,5 +1,25 @@
 # CHANGELOG — AuditorSecSuite_PRE
 
+## v0.2.5-pre — preflight canónico de publicación
+
+### Añadido
+- Añadido wrapper canónico raíz `./publication_preflight.sh`.
+- El cierre de bloques publicados debe ejecutar siempre este wrapper antes de `git push`.
+- El wrapper valida working tree limpio, ficheros sensibles básicos, security audit, alineación documental/proyecto y whitespace.
+
+### Corregido
+- Evitado el falso bloqueo producido por invocar un preflight inexistente en raíz.
+
+### Validación
+- `bash -n publication_preflight.sh` OK.
+- `./publication_preflight.sh` OK.
+- `manage.py check` OK.
+- `makemigrations --check --dry-run` OK.
+- `python manage.py test core` OK.
+- Security audit OK.
+- Validadores de documentación/proyecto OK.
+- CI GitHub pendiente tras push.
+
 ## v0.2.4-pre — selector dinámico de activos en Findings
 
 ### Mejorado
