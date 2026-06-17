@@ -17,3 +17,5 @@ Docs vivos en Documentacio/docs. Código: app/core/models.py, views.py, tests.py
 - `SPEC_005_FINDINGS_MANUALES.md`: findings manuales vinculados a auditoría y activo de la auditoría.
 
 - `SPEC_006_CHECKS_SEGUROS_PLANIFICADOS.md`: catálogo y planificación de checks seguros sin ejecución.
+
+- `app/core/migrations/0003_seed_initial_safe_check_definitions.py`: seed declarativo del catálogo inicial de checks seguros.
