@@ -1,5 +1,18 @@
 # CHANGELOG — AuditorSecSuite_PRE
 
+## v0.1.3-pre — SECURITY raíz
+
+### Añadido
+- `SECURITY.md` raíz para el repositorio público.
+
+### Seguridad
+- Se explicita el uso dual controlado y la prohibición de publicar secretos, evidencias reales o datos de terceros.
+
+### Límites
+- No se añaden todavía plantillas de issue/PR.
+- No se añade todavía licencia raíz.
+- No se activa branch protection.
+
 ## v0.1.2-pre — CI público mínimo
 
 ### Añadido
