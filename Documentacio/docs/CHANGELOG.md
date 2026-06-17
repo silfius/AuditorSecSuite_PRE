@@ -1,5 +1,24 @@
 # CHANGELOG — AuditorSecSuite_PRE
 
+## v0.2.7-pre — checks seguros planificados
+
+### Añadido
+- Añadido catálogo declarativo de checks seguros.
+- Añadida planificación de checks por auditoría y activo.
+- Añadida sección de checks planificados en el detalle de auditoría.
+- Añadida especificación `SPEC_006_CHECKS_SEGUROS_PLANIFICADOS.md`.
+
+### Seguridad
+- No se ejecutan motores técnicos.
+- No se realizan llamadas de red.
+- No se invocan comandos shell ni `subprocess`.
+- Solo se permite planificar checks sobre activos vinculados a la auditoría y actualmente auditables.
+- Los checks intrusivos quedan bloqueados en esta fase.
+
+### Validación
+- Pendiente de cierre del bloque.
+
+
 ## v0.2.6-pre — detalle operativo de auditorías y findings
 
 ### Añadido
@@ -207,3 +226,36 @@
 - Se bloquea publicación si aparecen rutas internas reales, IP LAN real, dumps, logs, storage o evidencias reales.
 
 v0.1.0-pre — foundation inicial: scaffold Docker/Django/PostgreSQL, modelos base, documentación viva, specs y validadores. Sin escaneos ni publicación externa.
+
+<!-- AUDITORSECSUITE_SAFE_CHECKS_7A_VALIDATION_20260617 -->
+### Evidencia de validación — checks seguros planificados sin ejecución real
+
+Fecha: 2026-06-17.
+
+Bloque funcional cerrado: catálogo y planificación de checks seguros, sin ejecución técnica.
+
+Evidencias ejecutadas:
+
+- Web recuperada y saludable: `/health/` respondió 200 tras rebuild con espera robusta.
+- Migración aplicada: `core.0002_checkdefinition_auditcheckplan`.
+- `python manage.py check`: OK.
+- `python manage.py makemigrations --check --dry-run`: OK.
+- `python manage.py test core.tests.SafeCheckPlanningTests -v 2`: 5 tests OK.
+- `python manage.py test core -v 2`: 40 tests OK.
+- Auditoría anti-ejecución: sin `subprocess`, `os.system`, `Popen`, `requests.` ni `socket.` en modelos/forms/views/templates del bloque.
+- Security audit: `OK_SECURITY_AUDIT=1`.
+- Validadores documentales/proyecto: `OK_DOCUMENTATION_ALIGNMENT=1` y `OK_PROJECT_ALIGNMENT=1`.
+- Smoke funcional autenticado:
+  - listado de checks: HTTP 200.
+  - formulario de check: HTTP 200.
+  - formulario de planificación: HTTP 200.
+  - creación de check declarativo: HTTP 302.
+  - planificación de check: HTTP 302.
+  - detalle de auditoría: HTTP 200.
+  - el detalle muestra “Checks planificados”, nombre y código del check.
+  - `FINDINGS_BEFORE=3` y `FINDINGS_AFTER=3`.
+  - `NO_AUTOMATIC_FINDINGS_CREATED=1`.
+  - `NO_ENGINE_EXECUTION_TRIGGERED=1`.
+  - `SMOKE_CLEANUP_OK=1`, sin residuos de smoke.
+
+Conclusión: la capa queda validada como planificación declarativa/controlada, sin motor real, sin red, sin comandos y sin creación automática de findings.

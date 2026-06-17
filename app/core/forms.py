@@ -1,6 +1,8 @@
 from django import forms
 
 from .models import Activo, Auditoria, AuditoriaActivo, Finding
+from .models import CheckDefinition, AuditCheckPlan
+from django.core.exceptions import ValidationError
 
 
 class ActivoForm(forms.ModelForm):
@@ -141,3 +143,63 @@ class FindingForm(forms.ModelForm):
                 self.add_error("activo", "El activo seleccionado no es auditable.")
 
         return cleaned
+
+
+
+class CheckDefinitionForm(forms.ModelForm):
+    class Meta:
+        model = CheckDefinition
+        fields = [
+            "codigo",
+            "nombre",
+            "descripcion",
+            "categoria",
+            "engine_key",
+            "tipo_activo_aplicable",
+            "is_enabled",
+            "nivel_riesgo_operativo",
+            "requiere_autorizacion",
+        ]
+
+
+class AuditCheckPlanForm(forms.ModelForm):
+    class Meta:
+        model = AuditCheckPlan
+        fields = ["check_definition", "activo", "estado", "motivo_bloqueo"]
+
+    def __init__(self, *args, auditoria=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.auditoria = auditoria
+
+        self.fields["check_definition"].queryset = (
+            CheckDefinition.objects
+            .filter(is_enabled=True)
+            .exclude(nivel_riesgo_operativo=CheckDefinition.RISK_INTRUSIVE)
+            .order_by("categoria", "codigo")
+        )
+
+        if auditoria is None:
+            self.fields["activo"].queryset = Activo.objects.none()
+        else:
+            activos_ids = [
+                relacion.activo_id
+                for relacion in AuditoriaActivo.objects.select_related("activo").filter(auditoria=auditoria)
+                if relacion.activo and relacion.activo.puede_auditarse()
+            ]
+            self.fields["activo"].queryset = Activo.objects.filter(pk__in=activos_ids).order_by("nombre")
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if self.auditoria is not None and cleaned_data.get("activo") and cleaned_data.get("check_definition"):
+            plan = AuditCheckPlan(
+                auditoria=self.auditoria,
+                activo=cleaned_data.get("activo"),
+                check_definition=cleaned_data.get("check_definition"),
+                estado=cleaned_data.get("estado") or AuditCheckPlan.STATE_PLANNED,
+                motivo_bloqueo=cleaned_data.get("motivo_bloqueo") or "",
+            )
+            try:
+                plan.clean()
+            except ValidationError as exc:
+                raise forms.ValidationError(exc)
+        return cleaned_data

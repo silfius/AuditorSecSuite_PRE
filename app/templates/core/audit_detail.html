@@ -133,4 +133,51 @@
     </tbody>
   </table>
 </div>
+
+<section class="card">
+  <div class="toolbar">
+    <div>
+      <h2>Checks planificados</h2>
+      <p>Planificación segura sin ejecución técnica.</p>
+    </div>
+    <a class="button secondary" href="{% url 'core_audit_check_plan_create' audit.pk %}">Añadir check</a>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Check</th>
+        <th>Activo</th>
+        <th>Categoría</th>
+        <th>Riesgo</th>
+        <th>Estado</th>
+        <th>Acción</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for plan in check_plans %}
+        <tr>
+          <td>{{ plan.check_definition.nombre }}<br><code>{{ plan.check_definition.codigo }}</code></td>
+          <td>{{ plan.activo }}</td>
+          <td>{{ plan.check_definition.get_categoria_display }}</td>
+          <td><span class="chip">{{ plan.check_definition.get_nivel_riesgo_operativo_display }}</span></td>
+          <td><span class="chip">{{ plan.get_estado_display }}</span></td>
+          <td>
+            {% if plan.estado != "omitted" %}
+              <form method="post" action="{% url 'core_audit_check_plan_omit' audit.pk plan.pk %}">
+                {% csrf_token %}
+                <button class="button secondary" type="submit">Omitir</button>
+              </form>
+            {% else %}
+              —
+            {% endif %}
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="6">No hay checks planificados para esta auditoría.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
 {% endblock %}

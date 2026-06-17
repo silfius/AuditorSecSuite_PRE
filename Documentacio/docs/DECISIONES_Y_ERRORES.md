@@ -23,3 +23,14 @@ Antes de integrar motores técnicos se implementan findings manuales revisables.
 ## 2026-06-17 — Preflight raíz canónico
 
 Se detectó un falso bloqueo tras commit porque el bloque de cierre invocó `./publication_preflight.sh` y el fichero no existía en raíz. Se decide crear ese wrapper como ruta canónica, manteniendo dentro las comprobaciones de seguridad, documentación, proyecto y whitespace.
+
+## Decisión — checks planificados antes de motores reales
+
+Antes de integrar motores técnicos reales se implementa una capa de catálogo y planificación de checks. Esta decisión reduce riesgo operativo, mantiene la trazabilidad y evita introducir ejecución técnica prematura.
+
+<!-- AUDITORSECSUITE_SAFE_CHECKS_7A_VALIDATION_20260617_OPERACION -->
+### Nota operativa — contenedor sin bind mount de código
+
+Durante el bloque de checks seguros se confirmó que el servicio `app` usa `COPY app /app` en la imagen y no un bind mount del código fuente. Por tanto, después de modificar código en el host, Django dentro del contenedor no ve los cambios hasta ejecutar `docker compose up -d --build app`.
+
+También queda como cautela operativa no imprimir `docker compose config` completo en salidas compartidas, porque puede exponer valores procedentes de `.env`.

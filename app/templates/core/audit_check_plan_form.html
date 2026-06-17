@@ -1,0 +1,25 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<section class="card">
+  <div class="toolbar">
+    <div>
+      <h1>{{ title }}</h1>
+      <p>Auditoría: {{ auditoria }}</p>
+    </div>
+    <a class="button secondary" href="javascript:history.back()">Volver</a>
+  </div>
+
+  <div class="notice">
+    Este formulario solo planifica checks. No ejecuta motores, no realiza llamadas de red y no genera findings automáticos.
+  </div>
+
+  <form method="post" class="form-grid">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="form-actions">
+      <button class="button" type="submit">Planificar</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

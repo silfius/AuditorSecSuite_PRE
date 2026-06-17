@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.core.exceptions import ValidationError
 
 class Activo(models.Model):
     class Tipo(models.TextChoices):
@@ -105,3 +106,153 @@ class Finding(models.Model):
 
     def __str__(self):
         return f"[{self.get_severidad_display()}] {self.titulo}"
+
+
+
+class CheckDefinition(models.Model):
+    """Definición declarativa de checks técnicos seguros.
+
+    No contiene comandos, argumentos ejecutables ni lógica de ejecución.
+    """
+
+    CATEGORY_TLS = "tls"
+    CATEGORY_HTTP = "http"
+    CATEGORY_DNS = "dns"
+    CATEGORY_INFRA = "infra"
+    CATEGORY_WEB = "web"
+    CATEGORY_INTERNAL = "internal"
+
+    CATEGORY_CHOICES = [
+        (CATEGORY_TLS, "TLS / Certificados"),
+        (CATEGORY_HTTP, "HTTP / Cabeceras"),
+        (CATEGORY_DNS, "DNS"),
+        (CATEGORY_INFRA, "Infraestructura"),
+        (CATEGORY_WEB, "Aplicación web"),
+        (CATEGORY_INTERNAL, "Control interno"),
+    ]
+
+    ENGINE_MANUAL = "manual"
+    ENGINE_NOOP = "noop"
+    ENGINE_FUTURE_TESTSSL = "future_testssl"
+    ENGINE_FUTURE_SSLYZE = "future_sslyze"
+    ENGINE_FUTURE_ZAP = "future_zap"
+    ENGINE_FUTURE_GREENBONE = "future_greenbone"
+
+    ENGINE_CHOICES = [
+        (ENGINE_MANUAL, "Manual / revisable"),
+        (ENGINE_NOOP, "Simulado / noop"),
+        (ENGINE_FUTURE_TESTSSL, "Futuro testssl"),
+        (ENGINE_FUTURE_SSLYZE, "Futuro SSLyze"),
+        (ENGINE_FUTURE_ZAP, "Futuro ZAP"),
+        (ENGINE_FUTURE_GREENBONE, "Futuro Greenbone"),
+    ]
+
+    RISK_PASSIVE = "passive"
+    RISK_CONTROLLED = "controlled"
+    RISK_INTRUSIVE = "intrusive"
+
+    RISK_CHOICES = [
+        (RISK_PASSIVE, "Pasivo / seguro"),
+        (RISK_CONTROLLED, "Controlado"),
+        (RISK_INTRUSIVE, "Intrusivo — no permitido todavía"),
+    ]
+
+    codigo = models.SlugField(max_length=80, unique=True)
+    nombre = models.CharField(max_length=160)
+    descripcion = models.TextField(blank=True)
+    categoria = models.CharField(max_length=32, choices=CATEGORY_CHOICES, default=CATEGORY_INTERNAL)
+    engine_key = models.CharField(max_length=40, choices=ENGINE_CHOICES, default=ENGINE_MANUAL)
+    tipo_activo_aplicable = models.CharField(max_length=80, blank=True)
+    is_enabled = models.BooleanField(default=True)
+    nivel_riesgo_operativo = models.CharField(
+        max_length=32,
+        choices=RISK_CHOICES,
+        default=RISK_PASSIVE,
+    )
+    requiere_autorizacion = models.BooleanField(default=True)
+    creado_en = models.DateTimeField(auto_now_add=True)
+    actualizado_en = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["categoria", "codigo"]
+
+    def __str__(self):
+        return f"{self.codigo} — {self.nombre}"
+
+
+class AuditCheckPlan(models.Model):
+    """Planificación segura de checks sobre una auditoría y activo autorizado.
+
+    Esta entidad no ejecuta motores. Solo registra intención/planificación.
+    """
+
+    STATE_PLANNED = "planned"
+    STATE_READY = "ready"
+    STATE_BLOCKED = "blocked"
+    STATE_OMITTED = "omitted"
+
+    STATE_CHOICES = [
+        (STATE_PLANNED, "Planificado"),
+        (STATE_READY, "Preparado sin ejecutar"),
+        (STATE_BLOCKED, "Bloqueado"),
+        (STATE_OMITTED, "Omitido"),
+    ]
+
+    auditoria = models.ForeignKey(Auditoria, on_delete=models.CASCADE, related_name="check_plans")
+    activo = models.ForeignKey(Activo, on_delete=models.CASCADE, related_name="check_plans")
+    check_definition = models.ForeignKey(CheckDefinition, on_delete=models.PROTECT, related_name="audit_plans")
+    estado = models.CharField(max_length=24, choices=STATE_CHOICES, default=STATE_PLANNED)
+    motivo_bloqueo = models.TextField(blank=True)
+    creado_por = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="audit_check_plans",
+    )
+    creado_en = models.DateTimeField(auto_now_add=True)
+    actualizado_en = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["auditoria", "activo", "check_definition"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["auditoria", "activo", "check_definition"],
+                name="unique_audit_asset_check_plan",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.auditoria} · {self.activo} · {self.check_definition}"
+
+    def clean(self):
+        super().clean()
+
+        if self.activo_id and not self.activo.puede_auditarse():
+            raise ValidationError({
+                "activo": "Solo se pueden planificar checks sobre activos activos y autorizados."
+            })
+
+        if self.auditoria_id and self.activo_id:
+            vinculado = AuditoriaActivo.objects.filter(
+                auditoria=self.auditoria,
+                activo=self.activo,
+            ).exists()
+            if not vinculado:
+                raise ValidationError({
+                    "activo": "El activo debe estar vinculado a la auditoría seleccionada."
+                })
+
+        if self.check_definition_id:
+            if not self.check_definition.is_enabled:
+                raise ValidationError({
+                    "check_definition": "No se puede planificar un check desactivado."
+                })
+            if self.check_definition.nivel_riesgo_operativo == CheckDefinition.RISK_INTRUSIVE:
+                raise ValidationError({
+                    "check_definition": "Los checks intrusivos no están permitidos en esta fase."
+                })
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)
