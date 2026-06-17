@@ -8,6 +8,8 @@ urlpatterns = [
     path("health/", views.health, name="health"),
     path("app/", views.dashboard, name="dashboard"),
     path("app/activos/", views.asset_list, name="asset_list"),
+    path("app/activos/nuevo/", views.asset_create, name="asset_create"),
+    path("app/activos/<int:pk>/editar/", views.asset_update, name="asset_update"),
     path("app/auditorias/", views.audit_list, name="audit_list"),
     path("app/findings/", views.finding_list, name="finding_list"),
     path("admin/", admin.site.urls),

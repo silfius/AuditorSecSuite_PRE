@@ -9,3 +9,5 @@ Docs vivos en Documentacio/docs. Código: app/core/models.py, views.py, tests.py
 - `SPEC_002_PUBLIC_REPO_HARDENING.md`: endurecimiento del repositorio público.
 - `.github/pull_request_template.md`: plantilla de pull request.
 - `.github/ISSUE_TEMPLATE/`: plantillas de issues.
+
+- `SPEC_003_INVENTARIO_ACTIVOS_AUTORIZADOS.md`: inventario inicial de activos autorizados.

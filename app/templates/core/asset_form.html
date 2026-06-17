@@ -1,0 +1,17 @@
+{% extends "core/base.html" %}
+{% block content %}
+<h1>{{ title }}</h1>
+
+<div class="card">
+  <p><strong>Regla de seguridad:</strong> solo marca un activo como autorizado si es propio o existe autorización explícita para auditarlo.</p>
+</div>
+
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <p>
+    <button type="submit">{{ submit_label }}</button>
+    <a href="{% url "asset_list" %}">Cancelar</a>
+  </p>
+</form>
+{% endblock %}

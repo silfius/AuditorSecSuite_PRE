@@ -28,6 +28,9 @@ class Activo(models.Model):
     def __str__(self):
         return f"{self.nombre} ({self.valor})"
 
+    def puede_auditarse(self):
+        return self.activo and self.autorizado
+
 
 class Auditoria(models.Model):
     class Estado(models.TextChoices):

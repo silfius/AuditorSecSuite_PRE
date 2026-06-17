@@ -1,5 +1,18 @@
 # CHANGELOG — AuditorSecSuite_PRE
 
+## v0.2.0-pre — inventario de activos autorizados
+
+### Añadido
+- Alta y edición de activos desde interfaz web.
+- `ActivoForm` para normalizar campos de inventario.
+- Guardarraíl funcional `Activo.puede_auditarse()`.
+- Tests de formulario, vistas autenticadas, creación, edición y autorización.
+- `SPEC_003_INVENTARIO_ACTIVOS_AUTORIZADOS.md`.
+
+### Seguridad
+- Los activos no autorizados quedan visibles como no aptos para auditoría.
+- No se integran motores de escaneo en este bloque.
+
 ## v0.1.6-pre — plantillas públicas y premisas operativas
 
 ### Añadido
