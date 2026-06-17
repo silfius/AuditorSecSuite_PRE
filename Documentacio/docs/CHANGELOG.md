@@ -1,5 +1,13 @@
 # CHANGELOG — AuditorSecSuite_PRE
 
+## v0.1.4-pre — contrato real de publication preflight
+
+### Corregido
+- `publication_preflight.sh` ahora devuelve código de error cuando detecta `STOP_PUBLICATION_PREFLIGHT=1`.
+
+### Seguridad
+- Se evita que una publicación continúe si el preflight muestra fallo lógico.
+
 ## v0.1.3-pre — SECURITY raíz
 
 ### Añadido

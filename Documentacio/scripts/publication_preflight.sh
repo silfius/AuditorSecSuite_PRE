@@ -84,9 +84,12 @@ if [ "$STOP" = "0" ]; then
 fi
 
 echo
+echo
 echo "== 6) Resultado =="
 if [ "$STOP" = "0" ]; then
   echo "OK_PUBLICATION_PREFLIGHT=1"
+  exit 0
 else
   echo "STOP_PUBLICATION_PREFLIGHT=1"
+  exit 1
 fi
