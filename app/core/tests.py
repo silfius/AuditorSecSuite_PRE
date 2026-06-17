@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from .forms import ActivoForm, AuditoriaForm
+from .forms import ActivoForm, AuditoriaForm, FindingForm
 from .models import Activo, Auditoria, AuditoriaActivo, Finding
 from .version import APPLICATION_VERSION
 
@@ -288,3 +288,150 @@ class AuditViewsTests(TestCase):
         audit.refresh_from_db()
         self.assertEqual(audit.estado, self.alt_estado_value)
         self.assertEqual(audit.auditoria_activos.count(), 1)
+
+
+class FindingFormTests(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(username="finding-form-user", password="unused")
+        self.audit = Auditoria.objects.create(
+            nombre="Auditoría findings",
+            alcance="Alcance findings.",
+            perfil=Auditoria._meta.get_field("perfil").choices[0][0],
+            estado=Auditoria._meta.get_field("estado").choices[0][0],
+            creado_por=self.user,
+        )
+        self.linked_asset = Activo.objects.create(
+            nombre="Activo en auditoría",
+            tipo=Activo.Tipo.URL,
+            valor="https://finding-linked.example.test",
+            entorno="PRE",
+            autorizado=True,
+            activo=True,
+        )
+        self.external_asset = Activo.objects.create(
+            nombre="Activo externo",
+            tipo=Activo.Tipo.URL,
+            valor="https://finding-external.example.test",
+            entorno="PRE",
+            autorizado=True,
+            activo=True,
+        )
+        AuditoriaActivo.objects.create(auditoria=self.audit, activo=self.linked_asset)
+
+    def finding_payload(self, activo):
+        data = {
+            "auditoria": str(self.audit.pk),
+            "activo": str(activo.pk),
+            "titulo": "Cabecera de seguridad ausente",
+            "severidad": Finding._meta.get_field("severidad").choices[0][0],
+            "estado": Finding._meta.get_field("estado").choices[0][0],
+        }
+        field_names = {field.name for field in Finding._meta.fields}
+        if "descripcion" in field_names:
+            data["descripcion"] = "Descripción manual del hallazgo."
+        if "recomendacion" in field_names:
+            data["recomendacion"] = "Aplicar cabecera de seguridad correspondiente."
+        if "herramienta" in field_names:
+            data["herramienta"] = "Manual"
+        return data
+
+    def test_finding_form_accepts_asset_linked_to_audit(self):
+        form = FindingForm(data=self.finding_payload(self.linked_asset))
+        self.assertTrue(form.is_valid(), form.errors)
+
+    def test_finding_form_rejects_asset_not_linked_to_audit(self):
+        form = FindingForm(data=self.finding_payload(self.external_asset))
+        self.assertFalse(form.is_valid())
+        self.assertIn("activo", form.errors)
+
+
+class FindingViewsTests(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(username="finding-view-user", password="unused")
+        self.audit = Auditoria.objects.create(
+            nombre="Auditoría finding vista",
+            alcance="Alcance finding vista.",
+            perfil=Auditoria._meta.get_field("perfil").choices[0][0],
+            estado=Auditoria._meta.get_field("estado").choices[0][0],
+            creado_por=self.user,
+        )
+        self.linked_asset = Activo.objects.create(
+            nombre="Activo finding vinculado",
+            tipo=Activo.Tipo.URL,
+            valor="https://finding-view-linked.example.test",
+            entorno="PRE",
+            autorizado=True,
+            activo=True,
+        )
+        self.external_asset = Activo.objects.create(
+            nombre="Activo finding externo",
+            tipo=Activo.Tipo.URL,
+            valor="https://finding-view-external.example.test",
+            entorno="PRE",
+            autorizado=True,
+            activo=True,
+        )
+        AuditoriaActivo.objects.create(auditoria=self.audit, activo=self.linked_asset)
+
+    def finding_payload(self, activo, title="Finding manual vista"):
+        data = {
+            "auditoria": str(self.audit.pk),
+            "activo": str(activo.pk),
+            "titulo": title,
+            "severidad": Finding._meta.get_field("severidad").choices[0][0],
+            "estado": Finding._meta.get_field("estado").choices[0][0],
+        }
+        field_names = {field.name for field in Finding._meta.fields}
+        if "descripcion" in field_names:
+            data["descripcion"] = "Descripción manual del finding."
+        if "recomendacion" in field_names:
+            data["recomendacion"] = "Recomendación manual."
+        if "herramienta" in field_names:
+            data["herramienta"] = "Manual"
+        return data
+
+    def test_finding_list_requires_login(self):
+        response = self.client.get(reverse("finding_list"))
+        self.assertEqual(response.status_code, 302)
+
+    def test_finding_create_requires_login(self):
+        response = self.client.get(reverse("finding_create"))
+        self.assertEqual(response.status_code, 302)
+
+    def test_authenticated_user_can_create_manual_finding(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            reverse("finding_create"),
+            data=self.finding_payload(self.linked_asset),
+            follow=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(Finding.objects.filter(titulo="Finding manual vista", activo=self.linked_asset, auditoria=self.audit).exists())
+        self.assertContains(response, "Finding manual vista")
+
+    def test_authenticated_user_cannot_create_finding_for_external_asset(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            reverse("finding_create"),
+            data=self.finding_payload(self.external_asset, title="Finding externo no permitido"),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(Finding.objects.filter(titulo="Finding externo no permitido").exists())
+
+    def test_authenticated_user_can_update_manual_finding(self):
+        finding = Finding.objects.create(
+            auditoria=self.audit,
+            activo=self.linked_asset,
+            titulo="Finding editable",
+            severidad=Finding._meta.get_field("severidad").choices[0][0],
+            estado=Finding._meta.get_field("estado").choices[0][0],
+        )
+        self.client.force_login(self.user)
+        response = self.client.post(
+            reverse("finding_update", args=[finding.pk]),
+            data=self.finding_payload(self.linked_asset, title="Finding editado"),
+            follow=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        finding.refresh_from_db()
+        self.assertEqual(finding.titulo, "Finding editado")

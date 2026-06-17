@@ -1,5 +1,26 @@
 # CHANGELOG — AuditorSecSuite_PRE
 
+## v0.2.3-pre — findings manuales vinculados
+
+### Añadido
+- `SPEC_005_FINDINGS_MANUALES.md`.
+- Alta y edición de findings manuales desde interfaz web.
+- `FindingForm` con validación server-side de auditoría y activo.
+- Rutas `/app/findings/nuevo/` y `/app/findings/<id>/editar/`.
+- Tests `FindingFormTests` y `FindingViewsTests`.
+
+### Seguridad
+- Un finding solo puede vincularse a un activo incluido en la auditoría correspondiente.
+- El servidor rechaza activos externos a la auditoría aunque se manipule el POST.
+- No se ejecutan motores reales ni se importan resultados automáticos en este bloque.
+
+### Validación
+- `manage.py check` OK.
+- `makemigrations --check --dry-run` OK.
+- `python manage.py test core`: 27 tests OK.
+- Smoke HTTP autenticado de findings OK.
+- Revisión visual aceptada por usuario.
+
 ## v0.2.2-pre — auditorías con activos autorizados
 
 ### Añadido

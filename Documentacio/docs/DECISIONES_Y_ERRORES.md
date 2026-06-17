@@ -15,3 +15,7 @@ Aunque el repositorio sea público, se mantiene `All rights reserved` hasta deci
 Se establece que los commits deben ser estrictamente necesarios y no producirse por cada cambio menor. Se prioriza agrupar cambios en unidades revisables, validadas y con sentido funcional o de seguridad.
 
 También se establece que el asistente debe actuar de forma crítica ante las decisiones propuestas por el usuario: no debe validar automáticamente una decisión si existe una alternativa más segura, mantenible, sencilla o técnicamente superior.
+
+## Finding manual antes de motores
+
+Antes de integrar motores técnicos se implementan findings manuales revisables. Esto permite consolidar auditoría, activo, severidad, estado y recomendación sin depender de resultados automáticos ni ejecutar acciones técnicas.

@@ -1,0 +1,84 @@
+{% extends "core/base.html" %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <h1 class="page-title">{{ title }}</h1>
+    <p class="page-subtitle">Registra un hallazgo manual. El activo debe pertenecer a la auditoría seleccionada.</p>
+  </div>
+</section>
+
+<div class="notice">
+  <strong>Guardarraíl:</strong> el servidor rechaza findings asociados a activos que no estén vinculados a la auditoría.
+</div>
+
+<form method="post" class="form-card">
+  {% csrf_token %}
+
+  {% if form.non_field_errors %}
+    <div class="notice warn">{{ form.non_field_errors }}</div>
+  {% endif %}
+
+  <div class="form-grid">
+    <div class="field">
+      <label for="{{ form.auditoria.id_for_label }}">Auditoría</label>
+      {{ form.auditoria }}
+      {% if form.auditoria.errors %}<div class="help">{{ form.auditoria.errors }}</div>{% endif %}
+    </div>
+
+    <div class="field">
+      <label for="{{ form.activo.id_for_label }}">Activo</label>
+      {{ form.activo }}
+      <div class="help">El desplegable se valida en servidor contra los activos vinculados a la auditoría.</div>
+      {% if form.activo.errors %}<div class="help">{{ form.activo.errors }}</div>{% endif %}
+    </div>
+
+    <div class="field field-full">
+      <label for="{{ form.titulo.id_for_label }}">Título</label>
+      {{ form.titulo }}
+      {% if form.titulo.errors %}<div class="help">{{ form.titulo.errors }}</div>{% endif %}
+    </div>
+
+    <div class="field">
+      <label for="{{ form.severidad.id_for_label }}">Severidad</label>
+      {{ form.severidad }}
+      {% if form.severidad.errors %}<div class="help">{{ form.severidad.errors }}</div>{% endif %}
+    </div>
+
+    <div class="field">
+      <label for="{{ form.estado.id_for_label }}">Estado</label>
+      {{ form.estado }}
+      {% if form.estado.errors %}<div class="help">{{ form.estado.errors }}</div>{% endif %}
+    </div>
+
+    {% if form.herramienta %}
+      <div class="field field-full">
+        <label for="{{ form.herramienta.id_for_label }}">Herramienta / origen</label>
+        {{ form.herramienta }}
+        <div class="help">Usa “Manual” si no procede de una herramienta automática.</div>
+        {% if form.herramienta.errors %}<div class="help">{{ form.herramienta.errors }}</div>{% endif %}
+      </div>
+    {% endif %}
+
+    {% if form.descripcion %}
+      <div class="field field-full">
+        <label for="{{ form.descripcion.id_for_label }}">Descripción</label>
+        {{ form.descripcion }}
+        {% if form.descripcion.errors %}<div class="help">{{ form.descripcion.errors }}</div>{% endif %}
+      </div>
+    {% endif %}
+
+    {% if form.recomendacion %}
+      <div class="field field-full">
+        <label for="{{ form.recomendacion.id_for_label }}">Recomendación</label>
+        {{ form.recomendacion }}
+        {% if form.recomendacion.errors %}<div class="help">{{ form.recomendacion.errors }}</div>{% endif %}
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="form-actions">
+    <button class="btn btn-primary" type="submit">{{ submit_label }}</button>
+    <a class="btn btn-secondary" href="{% url "finding_list" %}">Cancelar</a>
+  </div>
+</form>
+{% endblock %}

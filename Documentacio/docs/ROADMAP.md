@@ -9,3 +9,7 @@ Primer bloque funcional real tras el hardening público. Debe crear una base seg
 ## Bloque funcional 2 — auditorías con activos autorizados
 
 Crear alta/edición de auditorías seleccionando exclusivamente activos auditables. No se integran motores técnicos en este bloque.
+
+## Bloque funcional 3 — findings manuales
+
+Crear alta/edición de findings manuales vinculados a una auditoría y a activos pertenecientes a esa auditoría. No se integran motores automáticos.

@@ -25,3 +25,12 @@ Un activo auditable debe estar activo y autorizado. Los activos no autorizados o
 
 Pendiente de captura: listado de auditorías.
 Pendiente de captura: formulario de alta/edición de auditoría.
+
+## Findings manuales vinculados
+
+Desde `Findings` se puede crear o editar un hallazgo manual vinculado a una auditoría y a un activo perteneciente a esa auditoría.
+
+El sistema valida en servidor que el activo seleccionado forme parte de la auditoría. Este flujo no ejecuta motores automáticos.
+
+Pendiente de captura: listado de findings.
+Pendiente de captura: formulario de alta/edición de finding.

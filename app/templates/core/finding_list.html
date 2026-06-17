@@ -1,11 +1,50 @@
 {% extends "core/base.html" %}
 {% block content %}
-<h1>Findings</h1>
-<table><thead><tr><th>Título</th><th>Activo</th><th>Auditoría</th><th>Severidad</th><th>Estado</th></tr></thead><tbody>
-{% for finding in findings %}
-<tr><td>{{ finding.titulo }}</td><td>{{ finding.activo }}</td><td>{{ finding.auditoria }}</td><td><span class="pill">{{ finding.get_severidad_display }}</span></td><td>{{ finding.get_estado_display }}</td></tr>
-{% empty %}
-<tr><td colspan="5">Sin findings registrados.</td></tr>
-{% endfor %}
-</tbody></table>
+<section class="page-head">
+  <div>
+    <h1 class="page-title">Findings</h1>
+    <p class="page-subtitle">Hallazgos manuales revisables, vinculados a una auditoría y a un activo incluido en esa auditoría.</p>
+  </div>
+  <div class="toolbar">
+    <a class="btn btn-primary" href="{% url "finding_create" %}">+ Nuevo finding</a>
+  </div>
+</section>
+
+<div class="table-card">
+  <table>
+    <thead>
+      <tr>
+        <th>Título</th>
+        <th>Activo</th>
+        <th>Auditoría</th>
+        <th>Severidad</th>
+        <th>Estado</th>
+        <th>Herramienta</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for finding in findings %}
+        <tr>
+          <td><strong>{{ finding.titulo }}</strong></td>
+          <td>{{ finding.activo }}</td>
+          <td>{{ finding.auditoria }}</td>
+          <td><span class="pill">{{ finding.get_severidad_display }}</span></td>
+          <td><span class="pill pill-muted">{{ finding.get_estado_display }}</span></td>
+          <td>{{ finding.herramienta|default:"Manual" }}</td>
+          <td><a class="btn btn-secondary" href="{% url "finding_update" finding.pk %}">Editar</a></td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="7">
+            <div class="empty-state">
+              <strong>Sin findings registrados.</strong><br>
+              Crea el primer finding manual vinculado a una auditoría y a un activo de esa auditoría.
+            </div>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock %}

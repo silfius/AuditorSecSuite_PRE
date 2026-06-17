@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import ActivoForm, AuditoriaForm
+from .forms import ActivoForm, AuditoriaForm, FindingForm
 from .models import Activo, Auditoria, AuditoriaActivo, Finding
 
 
@@ -125,6 +125,44 @@ def audit_update(request, pk):
 
 @login_required
 def finding_list(request):
-    return render(request, "core/finding_list.html", {
-        "findings": Finding.objects.select_related("auditoria", "activo")
+    findings = Finding.objects.select_related("auditoria", "activo").all()
+    return render(request, "core/finding_list.html", {"findings": findings})
+
+
+@login_required
+def finding_create(request):
+    if request.method == "POST":
+        form = FindingForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Finding manual creado.")
+            return redirect("finding_list")
+    else:
+        form = FindingForm()
+
+    return render(request, "core/finding_form.html", {
+        "form": form,
+        "title": "Nuevo finding",
+        "submit_label": "Crear finding",
+    })
+
+
+@login_required
+def finding_update(request, pk):
+    finding = get_object_or_404(Finding, pk=pk)
+
+    if request.method == "POST":
+        form = FindingForm(request.POST, instance=finding)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Finding actualizado.")
+            return redirect("finding_list")
+    else:
+        form = FindingForm(instance=finding)
+
+    return render(request, "core/finding_form.html", {
+        "form": form,
+        "finding": finding,
+        "title": "Editar finding",
+        "submit_label": "Guardar finding",
     })

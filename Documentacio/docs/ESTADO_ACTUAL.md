@@ -29,3 +29,15 @@ Se implementa alta y edición de auditorías vinculadas únicamente a activos au
 ## Bloque 2D — cierre auditorías autorizadas
 
 Alta y edición de auditorías quedan implementadas con selección exclusiva de activos auditables. La revisión visual resulta aceptable para continuar el proyecto. No se integran ni ejecutan motores reales.
+
+## Siguiente bloque funcional — Findings manuales
+
+Se prepara el diseño del flujo de findings manuales. Un finding debe vincularse a una auditoría y a un activo previamente incluido en esa auditoría.
+
+## Bloque 3C — implementación de findings manuales
+
+Se implementa alta y edición de findings manuales vinculados a auditoría y a activos pertenecientes a esa auditoría. No se ejecutan motores reales.
+
+## Bloque 3D — cierre findings manuales
+
+Alta y edición de findings manuales quedan implementadas y validadas. El usuario confirma revisión visual correcta. No se integran ni ejecutan motores reales.

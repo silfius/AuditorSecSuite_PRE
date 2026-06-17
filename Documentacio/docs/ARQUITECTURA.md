@@ -13,3 +13,7 @@ La interfaz mantiene CSS propio en `core/base.html` como base inicial: página c
 ## Auditorías con activos autorizados
 
 `AuditoriaForm` filtra activos auditables y valida server-side que solo se vinculen activos con `Activo.puede_auditarse()`. La relación se persiste mediante `AuditoriaActivo`.
+
+## Findings manuales
+
+`FindingForm` valida server-side que el activo seleccionado esté vinculado a la auditoría mediante `AuditoriaActivo`. No ejecuta motores ni genera findings automáticos.
