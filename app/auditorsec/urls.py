@@ -11,6 +11,8 @@ urlpatterns = [
     path("app/activos/nuevo/", views.asset_create, name="asset_create"),
     path("app/activos/<int:pk>/editar/", views.asset_update, name="asset_update"),
     path("app/auditorias/", views.audit_list, name="audit_list"),
+    path("app/auditorias/nueva/", views.audit_create, name="audit_create"),
+    path("app/auditorias/<int:pk>/editar/", views.audit_update, name="audit_update"),
     path("app/findings/", views.finding_list, name="finding_list"),
     path("admin/", admin.site.urls),
 ]

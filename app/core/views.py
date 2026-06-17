@@ -3,8 +3,8 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import ActivoForm
-from .models import Activo, Auditoria, Finding
+from .forms import ActivoForm, AuditoriaForm
+from .models import Activo, Auditoria, AuditoriaActivo, Finding
 
 
 def health(request):
@@ -76,7 +76,51 @@ def asset_update(request, pk):
 
 @login_required
 def audit_list(request):
-    return render(request, "core/audit_list.html", {"audits": Auditoria.objects.all()})
+    audits = Auditoria.objects.prefetch_related("auditoria_activos__activo").all()
+    return render(request, "core/audit_list.html", {"audits": audits})
+
+
+@login_required
+def audit_create(request):
+    if request.method == "POST":
+        form = AuditoriaForm(request.POST)
+        if form.is_valid():
+            audit = form.save(commit=False)
+            audit.creado_por = request.user
+            audit.save()
+            form.save_activos(audit)
+            messages.success(request, "Auditoría creada con activos autorizados.")
+            return redirect("audit_list")
+    else:
+        form = AuditoriaForm()
+
+    return render(request, "core/audit_form.html", {
+        "form": form,
+        "title": "Nueva auditoría",
+        "submit_label": "Crear auditoría",
+    })
+
+
+@login_required
+def audit_update(request, pk):
+    audit = get_object_or_404(Auditoria, pk=pk)
+
+    if request.method == "POST":
+        form = AuditoriaForm(request.POST, instance=audit)
+        if form.is_valid():
+            audit = form.save()
+            form.save_activos(audit)
+            messages.success(request, "Auditoría actualizada.")
+            return redirect("audit_list")
+    else:
+        form = AuditoriaForm(instance=audit)
+
+    return render(request, "core/audit_form.html", {
+        "form": form,
+        "audit": audit,
+        "title": "Editar auditoría",
+        "submit_label": "Guardar auditoría",
+    })
 
 
 @login_required

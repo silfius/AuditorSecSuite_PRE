@@ -17,3 +17,15 @@ Tras revisión visual, se detecta que la interfaz inicial de activos era funcion
 ### UX 1 aceptada visualmente
 
 El usuario confirma que la nueva interfaz de activos mejora claramente respecto a la versión inicial. Queda pendiente aplicar el mismo criterio visual a futuros módulos cuando proceda.
+
+## Siguiente bloque funcional — Auditorías con activos autorizados
+
+Se prepara el diseño del flujo de auditorías vinculadas a activos auditables. El criterio de seguridad será `Activo.puede_auditarse()`.
+
+## Bloque 2C — implementación de auditorías autorizadas
+
+Se implementa alta y edición de auditorías vinculadas únicamente a activos auditables. No se ejecutan motores reales.
+
+## Bloque 2D — cierre auditorías autorizadas
+
+Alta y edición de auditorías quedan implementadas con selección exclusiva de activos auditables. La revisión visual resulta aceptable para continuar el proyecto. No se integran ni ejecutan motores reales.

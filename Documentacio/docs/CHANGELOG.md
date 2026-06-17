@@ -1,5 +1,26 @@
 # CHANGELOG — AuditorSecSuite_PRE
 
+## v0.2.2-pre — auditorías con activos autorizados
+
+### Añadido
+- `SPEC_004_AUDITORIAS_ACTIVOS_AUTORIZADOS.md`.
+- Alta y edición de auditorías desde interfaz web.
+- `AuditoriaForm` con selección múltiple de activos auditables.
+- Rutas `/app/auditorias/nueva/` y `/app/auditorias/<id>/editar/`.
+- Tests `AuditFormTests` y `AuditViewsTests`.
+
+### Seguridad
+- Solo se pueden vincular activos con `Activo.puede_auditarse()`.
+- El servidor rechaza activos no autorizados o inactivos aunque se manipule el POST.
+- No se ejecutan motores reales en este bloque.
+
+### Validación
+- `manage.py check` OK.
+- `makemigrations --check --dry-run` OK.
+- `python manage.py test core`: 20 tests OK.
+- Smoke HTTP autenticado de auditorías OK.
+- Revisión visual aceptable.
+
 ## v0.2.1-pre — mejora visual de activos
 
 ### Mejorado

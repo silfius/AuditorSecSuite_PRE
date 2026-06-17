@@ -11,3 +11,5 @@ Docs vivos en Documentacio/docs. Código: app/core/models.py, views.py, tests.py
 - `.github/ISSUE_TEMPLATE/`: plantillas de issues.
 
 - `SPEC_003_INVENTARIO_ACTIVOS_AUTORIZADOS.md`: inventario inicial de activos autorizados.
+
+- `SPEC_004_AUDITORIAS_ACTIVOS_AUTORIZADOS.md`: auditorías vinculadas solo a activos auditables.

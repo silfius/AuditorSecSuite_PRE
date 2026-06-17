@@ -5,3 +5,7 @@ Un cambio no está validado sin evidencia. Validaciones: compose config, Django 
 ## Inventario de activos autorizados
 
 Cobertura prevista/ejecutada: `AssetFormTests`, `AssetViewsTests` y pruebas de modelo para asegurar que un activo solo es auditable si está activo y autorizado.
+
+## Auditorías con activos autorizados
+
+Cobertura prevista/ejecutada: `AuditFormTests` y `AuditViewsTests` para validar login requerido, creación, edición y rechazo de activos no auditables.

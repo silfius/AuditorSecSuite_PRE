@@ -1,11 +1,48 @@
 {% extends "core/base.html" %}
 {% block content %}
-<h1>Auditorías</h1>
-<table><thead><tr><th>Nombre</th><th>Perfil</th><th>Estado</th><th>Creada</th></tr></thead><tbody>
-{% for audit in audits %}
-<tr><td>{{ audit.nombre }}</td><td>{{ audit.get_perfil_display }}</td><td><span class="pill">{{ audit.get_estado_display }}</span></td><td>{{ audit.creado_en }}</td></tr>
-{% empty %}
-<tr><td colspan="4">Sin auditorías registradas.</td></tr>
-{% endfor %}
-</tbody></table>
+<section class="page-head">
+  <div>
+    <h1 class="page-title">Auditorías</h1>
+    <p class="page-subtitle">Auditorías internas vinculadas exclusivamente a activos auditables. En este bloque no se ejecutan motores técnicos.</p>
+  </div>
+  <div class="toolbar">
+    <a class="btn btn-primary" href="{% url "audit_create" %}">+ Nueva auditoría</a>
+  </div>
+</section>
+
+<div class="table-card">
+  <table>
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Perfil</th>
+        <th>Estado</th>
+        <th>Activos</th>
+        <th>Creada</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for audit in audits %}
+        <tr>
+          <td><strong>{{ audit.nombre }}</strong></td>
+          <td>{{ audit.get_perfil_display }}</td>
+          <td><span class="pill">{{ audit.get_estado_display }}</span></td>
+          <td>{{ audit.auditoria_activos.count }}</td>
+          <td>{{ audit.creado_en }}</td>
+          <td><a class="btn btn-secondary" href="{% url "audit_update" audit.pk %}">Editar</a></td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="6">
+            <div class="empty-state">
+              <strong>Sin auditorías registradas.</strong><br>
+              Crea una auditoría seleccionando activos autorizados.
+            </div>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock %}

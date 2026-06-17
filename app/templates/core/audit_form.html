@@ -1,0 +1,63 @@
+{% extends "core/base.html" %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <h1 class="page-title">{{ title }}</h1>
+    <p class="page-subtitle">Selecciona solo activos auditables. Un activo auditable debe estar activo y autorizado.</p>
+  </div>
+</section>
+
+<div class="notice">
+  <strong>Guardarraíl:</strong> aunque se manipule el formulario, el servidor rechaza activos no autorizados o inactivos.
+</div>
+
+<form method="post" class="form-card">
+  {% csrf_token %}
+
+  {% if form.non_field_errors %}
+    <div class="notice warn">{{ form.non_field_errors }}</div>
+  {% endif %}
+
+  <div class="form-grid">
+    <div class="field">
+      <label for="{{ form.nombre.id_for_label }}">Nombre</label>
+      {{ form.nombre }}
+      {% if form.nombre.errors %}<div class="help">{{ form.nombre.errors }}</div>{% endif %}
+    </div>
+
+    <div class="field">
+      <label for="{{ form.perfil.id_for_label }}">Perfil</label>
+      {{ form.perfil }}
+      {% if form.perfil.errors %}<div class="help">{{ form.perfil.errors }}</div>{% endif %}
+    </div>
+
+    <div class="field">
+      <label for="{{ form.estado.id_for_label }}">Estado</label>
+      {{ form.estado }}
+      {% if form.estado.errors %}<div class="help">{{ form.estado.errors }}</div>{% endif %}
+    </div>
+
+    <div class="field field-full">
+      <label for="{{ form.alcance.id_for_label }}">Alcance</label>
+      {{ form.alcance }}
+      {% if form.alcance.errors %}<div class="help">{{ form.alcance.errors }}</div>{% endif %}
+    </div>
+
+    <div class="field field-full">
+      <label>Activos auditables</label>
+      <div class="check-row">
+        <div>
+          {{ form.activos }}
+          {% if form.activos.help_text %}<div class="help">{{ form.activos.help_text }}</div>{% endif %}
+          {% if form.activos.errors %}<div class="help">{{ form.activos.errors }}</div>{% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button class="btn btn-primary" type="submit">{{ submit_label }}</button>
+    <a class="btn btn-secondary" href="{% url "audit_list" %}">Cancelar</a>
+  </div>
+</form>
+{% endblock %}
