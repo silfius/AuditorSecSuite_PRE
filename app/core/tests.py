@@ -435,3 +435,64 @@ class FindingViewsTests(TestCase):
         self.assertEqual(response.status_code, 200)
         finding.refresh_from_db()
         self.assertEqual(finding.titulo, "Finding editado")
+
+
+class FindingDynamicAssetSelectorTests(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(username="finding-selector-user", password="unused")
+        self.audit = Auditoria.objects.create(
+            nombre="Auditoría selector dinámico",
+            alcance="Alcance selector dinámico.",
+            perfil=Auditoria._meta.get_field("perfil").choices[0][0],
+            estado=Auditoria._meta.get_field("estado").choices[0][0],
+            creado_por=self.user,
+        )
+        self.linked_asset = Activo.objects.create(
+            nombre="Activo selector vinculado",
+            tipo=Activo.Tipo.URL,
+            valor="https://selector-linked.example.test",
+            entorno="PRE",
+            autorizado=True,
+            activo=True,
+        )
+        self.external_asset = Activo.objects.create(
+            nombre="Activo selector externo",
+            tipo=Activo.Tipo.URL,
+            valor="https://selector-external.example.test",
+            entorno="PRE",
+            autorizado=True,
+            activo=True,
+        )
+        self.unauthorized_asset = Activo.objects.create(
+            nombre="Activo selector no autorizado",
+            tipo=Activo.Tipo.URL,
+            valor="https://selector-unauthorized.example.test",
+            entorno="PRE",
+            autorizado=False,
+            activo=True,
+        )
+        AuditoriaActivo.objects.create(auditoria=self.audit, activo=self.linked_asset)
+        AuditoriaActivo.objects.create(auditoria=self.audit, activo=self.unauthorized_asset)
+
+    def test_finding_audit_assets_endpoint_requires_login(self):
+        response = self.client.get(reverse("finding_audit_assets", args=[self.audit.pk]))
+        self.assertEqual(response.status_code, 302)
+
+    def test_finding_audit_assets_endpoint_returns_only_linked_auditable_assets(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("finding_audit_assets", args=[self.audit.pk]))
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        asset_ids = {item["id"] for item in payload["assets"]}
+
+        self.assertIn(self.linked_asset.pk, asset_ids)
+        self.assertNotIn(self.external_asset.pk, asset_ids)
+        self.assertNotIn(self.unauthorized_asset.pk, asset_ids)
+
+    def test_finding_create_form_contains_dynamic_selector_hook(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("finding_create"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "data-assets-url-template")
+        self.assertContains(response, "/app/findings/auditorias/0/activos/")
+        self.assertContains(response, "loadAssets")

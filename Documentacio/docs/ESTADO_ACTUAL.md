@@ -41,3 +41,11 @@ Se implementa alta y edición de findings manuales vinculados a auditoría y a a
 ## Bloque 3D — cierre findings manuales
 
 Alta y edición de findings manuales quedan implementadas y validadas. El usuario confirma revisión visual correcta. No se integran ni ejecutan motores reales.
+
+## Bloque 4B — selector dinámico Findings
+
+Se implementa carga dinámica de activos auditables al seleccionar auditoría en el formulario de Findings. El backend continúa validando la relación auditoría-activo.
+
+## Bloque 4C — cierre selector dinámico Findings
+
+El selector dinámico de activos en Findings queda validado técnica y visualmente. Al escoger una auditoría, el campo Activo carga únicamente activos auditables vinculados a esa auditoría. Versión de cierre: `v0.2.4-pre`.

@@ -13,3 +13,8 @@ Crear alta/edición de auditorías seleccionando exclusivamente activos auditabl
 ## Bloque funcional 3 — findings manuales
 
 Crear alta/edición de findings manuales vinculados a una auditoría y a activos pertenecientes a esa auditoría. No se integran motores automáticos.
+
+### 2026-06-17 — Bloque cerrado: selector dinámico Findings
+
+- Cerrada la mejora UX/funcional que vincula dinámicamente auditoría y activos en el formulario de findings.
+- Siguiente evolución natural: mejorar detalle de auditoría/finding y preparar checks controlados sin ejecución real no autorizada.

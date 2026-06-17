@@ -13,3 +13,21 @@ Cobertura prevista/ejecutada: `AuditFormTests` y `AuditViewsTests` para validar 
 ## Findings manuales
 
 Cobertura prevista/ejecutada: `FindingFormTests` y `FindingViewsTests` para validar login requerido, creación, edición y rechazo de activos no vinculados a la auditoría.
+
+## Selector dinámico Findings auditoría-activo
+
+Cobertura: `FindingDynamicAssetSelectorTests` valida endpoint autenticado, exclusión de activos externos/no autorizados y presencia del hook JS en formulario.
+
+### 2026-06-17 — Validación cierre selector dinámico Findings
+
+Validaciones ejecutadas para cierre `v0.2.4-pre`:
+
+- Build Docker.
+- `python manage.py check`.
+- `python manage.py makemigrations --check --dry-run`.
+- Suite `core`: 30 tests OK.
+- Security audit.
+- Validadores de documentación y proyecto.
+- `git diff --check`.
+- Smoke HTTP autenticado del endpoint dinámico y del formulario de findings.
+- Validación visual aceptada por el usuario.

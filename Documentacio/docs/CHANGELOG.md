@@ -1,5 +1,29 @@
 # CHANGELOG — AuditorSecSuite_PRE
 
+## v0.2.4-pre — selector dinámico de activos en Findings
+
+### Mejorado
+- Añadido selector dinámico de activos en el formulario de findings.
+- Al seleccionar una auditoría, el formulario carga únicamente los activos auditables vinculados a esa auditoría.
+- Añadido endpoint autenticado `/app/findings/auditorias/<id>/activos/`.
+- Añadido JS en `finding_form.html` para recargar el desplegable de activos sin abandonar el formulario.
+
+### Seguridad
+- El endpoint solo devuelve activos activos, autorizados y vinculados a la auditoría.
+- La validación server-side de `FindingForm` sigue siendo la autoridad funcional.
+- No se ejecutan motores reales ni automatismos ofensivos.
+
+### Validación
+- Build Docker OK.
+- `manage.py check` OK.
+- `makemigrations --check --dry-run` OK.
+- `python manage.py test core`: 30 tests OK.
+- Security audit OK.
+- Validadores de documentación/proyecto OK.
+- `git diff --check` OK.
+- Smoke HTTP autenticado del selector dinámico OK.
+- Revisión visual aceptada por el usuario el 2026-06-17.
+
 ## v0.2.3-pre — findings manuales vinculados
 
 ### Añadido

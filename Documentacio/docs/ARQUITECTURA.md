@@ -17,3 +17,7 @@ La interfaz mantiene CSS propio en `core/base.html` como base inicial: página c
 ## Findings manuales
 
 `FindingForm` valida server-side que el activo seleccionado esté vinculado a la auditoría mediante `AuditoriaActivo`. No ejecuta motores ni genera findings automáticos.
+
+## Selector dinámico auditoría-activo en Findings
+
+El formulario de Findings usa un endpoint autenticado para cargar dinámicamente los activos auditables de la auditoría seleccionada. La validación server-side de `FindingForm` sigue siendo la autoridad funcional.

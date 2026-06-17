@@ -11,7 +11,7 @@
   <strong>Guardarraíl:</strong> el servidor rechaza findings asociados a activos que no estén vinculados a la auditoría.
 </div>
 
-<form method="post" class="form-card">
+<form method="post" class="form-card" id="finding-form" data-assets-url-template="{% url "finding_audit_assets" 0 %}">
   {% csrf_token %}
 
   {% if form.non_field_errors %}
@@ -22,13 +22,14 @@
     <div class="field">
       <label for="{{ form.auditoria.id_for_label }}">Auditoría</label>
       {{ form.auditoria }}
+      <div class="help">Al seleccionar una auditoría se cargarán solo sus activos auditables.</div>
       {% if form.auditoria.errors %}<div class="help">{{ form.auditoria.errors }}</div>{% endif %}
     </div>
 
     <div class="field">
       <label for="{{ form.activo.id_for_label }}">Activo</label>
       {{ form.activo }}
-      <div class="help">El desplegable se valida en servidor contra los activos vinculados a la auditoría.</div>
+      <div class="help" id="asset-selector-help">El activo debe pertenecer a la auditoría seleccionada.</div>
       {% if form.activo.errors %}<div class="help">{{ form.activo.errors }}</div>{% endif %}
     </div>
 
@@ -81,4 +82,95 @@
     <a class="btn btn-secondary" href="{% url "finding_list" %}">Cancelar</a>
   </div>
 </form>
+
+<script>
+(function () {
+  const form = document.getElementById("finding-form");
+  if (!form) return;
+
+  const auditSelect = document.getElementById("id_auditoria");
+  const assetSelect = document.getElementById("id_activo");
+  const help = document.getElementById("asset-selector-help");
+  const urlTemplate = form.dataset.assetsUrlTemplate;
+
+  if (!auditSelect || !assetSelect || !urlTemplate) return;
+
+  function setHelp(text) {
+    if (help) help.textContent = text;
+  }
+
+  function resetAssets(message) {
+    assetSelect.innerHTML = "";
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = message;
+    assetSelect.appendChild(option);
+  }
+
+  function loadAssets() {
+    const auditId = auditSelect.value;
+    const selectedAsset = assetSelect.value;
+
+    if (!auditId) {
+      resetAssets("Selecciona primero una auditoría");
+      assetSelect.disabled = true;
+      setHelp("Selecciona una auditoría para cargar sus activos auditables.");
+      return;
+    }
+
+    assetSelect.disabled = true;
+    resetAssets("Cargando activos...");
+    setHelp("Cargando activos auditables de la auditoría seleccionada.");
+
+    const url = urlTemplate.replace("/0/", "/" + auditId + "/");
+
+    fetch(url, {
+      method: "GET",
+      headers: {"Accept": "application/json"}
+    })
+      .then(function (response) {
+        if (!response.ok) throw new Error("Respuesta HTTP no válida");
+        return response.json();
+      })
+      .then(function (data) {
+        assetSelect.innerHTML = "";
+        const assets = data.assets || [];
+
+        if (!assets.length) {
+          resetAssets("Sin activos auditables en esta auditoría");
+          assetSelect.disabled = true;
+          setHelp("La auditoría seleccionada no tiene activos auditables vinculados.");
+          return;
+        }
+
+        const empty = document.createElement("option");
+        empty.value = "";
+        empty.textContent = "Selecciona un activo";
+        assetSelect.appendChild(empty);
+
+        assets.forEach(function (asset) {
+          const option = document.createElement("option");
+          option.value = String(asset.id);
+          option.textContent = asset.label;
+          if (String(asset.id) === selectedAsset) option.selected = true;
+          assetSelect.appendChild(option);
+        });
+
+        assetSelect.disabled = false;
+        setHelp("Activos cargados desde la auditoría seleccionada.");
+      })
+      .catch(function () {
+        resetAssets("No se pudieron cargar los activos");
+        assetSelect.disabled = true;
+        setHelp("Error cargando activos. Revisa la auditoría seleccionada.");
+      });
+  }
+
+  auditSelect.addEventListener("change", loadAssets);
+
+  if (!assetSelect.options.length || !assetSelect.value) {
+    loadAssets();
+  }
+})();
+</script>
 {% endblock %}

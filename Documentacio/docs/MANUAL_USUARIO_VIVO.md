@@ -34,3 +34,20 @@ El sistema valida en servidor que el activo seleccionado forme parte de la audit
 
 Pendiente de captura: listado de findings.
 Pendiente de captura: formulario de alta/edición de finding.
+
+## Selector dinámico de activos en Findings
+
+Al crear o editar un finding, al escoger la auditoría se carga el listado de activos auditables vinculados a esa auditoría. Si la auditoría no tiene activos auditables, el selector lo indica.
+
+Pendiente de captura: formulario de finding con selector de activos cargado dinámicamente.
+
+### Findings — selector dinámico validado `v0.2.4-pre`
+
+- En el formulario de alta/edición de findings, primero debe seleccionarse la auditoría.
+- Después, el campo Activo se recarga con los activos auditables vinculados a esa auditoría.
+- Si la auditoría no tiene activos auditables, el formulario muestra un mensaje informativo.
+- Validación visual aceptada el 2026-06-17.
+
+**Capturas pendientes para documentación final:**
+- [ ] Captura del formulario antes de seleccionar auditoría.
+- [ ] Captura del selector de activos cargado tras seleccionar auditoría.

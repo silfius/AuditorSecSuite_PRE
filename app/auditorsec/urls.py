@@ -14,6 +14,7 @@ urlpatterns = [
     path("app/auditorias/nueva/", views.audit_create, name="audit_create"),
     path("app/auditorias/<int:pk>/editar/", views.audit_update, name="audit_update"),
     path("app/findings/", views.finding_list, name="finding_list"),
+    path("app/findings/auditorias/<int:pk>/activos/", views.finding_audit_assets, name="finding_audit_assets"),
     path("app/findings/nuevo/", views.finding_create, name="finding_create"),
     path("app/findings/<int:pk>/editar/", views.finding_update, name="finding_update"),
     path("admin/", admin.site.urls),

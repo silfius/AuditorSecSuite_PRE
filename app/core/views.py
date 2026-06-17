@@ -130,6 +130,23 @@ def finding_list(request):
 
 
 @login_required
+def finding_audit_assets(request, pk):
+    audit = get_object_or_404(Auditoria, pk=pk)
+    assets = Activo.objects.filter(
+        auditoria_activos__auditoria=audit,
+        activo=True,
+        autorizado=True,
+    ).distinct().order_by("nombre")
+
+    return JsonResponse({
+        "assets": [
+            {"id": asset.pk, "label": str(asset)}
+            for asset in assets
+        ]
+    })
+
+
+@login_required
 def finding_create(request):
     if request.method == "POST":
         form = FindingForm(request.POST)
